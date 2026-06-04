@@ -17,6 +17,8 @@ Test assertion chain:
 5. Swiping through every splash screen reaches the signup screen.
 6. Signup screen accepts a random email/password and the **Signup** button is tappable.
 7. Name screen accepts a random name and the **Next** button advances to birth details.
+8. Birth-details screen accepts a date, time, and location, and **Next** advances to the
+   birth-chart summary.
 
 ## Locators (captured live via `adb uiautomator dump`)
 
@@ -64,6 +66,22 @@ Note: the app misspells the clickable button id as `txtSingup`. The correctly-sp
 Entering a name and tapping Next advances to the birth-details screen, which greets the
 user by name ("Good Evening 🌙 &lt;name&gt;") — confirming the value was accepted.
 
+### Screen E — Birth details (post-name, `StartupActivity`)
+
+| Element        | Locator (resource-id)                  | Type / behaviour |
+|----------------|----------------------------------------|------------------|
+| Birth date     | `com.dailyinsights:id/txtBirthDate`    | opens a DatePicker dialog |
+| Birth time     | `com.dailyinsights:id/txtBirthTime`    | opens a time dialog |
+| Birth location | `com.dailyinsights:id/txtBirthLocation`| opens Google Places autocomplete |
+| Picker confirm | `com.dailyinsights:id/ButtonSet`       | shared Set button for the date and time dialogs |
+| Places search  | `com.dailyinsights:id/places_autocomplete_search_bar` | EditText in the autocomplete screen |
+| Places result  | `com.dailyinsights:id/places_autocomplete_prediction_primary_text` | first row selects the city |
+| Next           | `com.dailyinsights:id/imgNext`         | advances to the birth-chart summary |
+
+The page object accepts the date/time pickers' shown values (taps `ButtonSet`) and selects
+the first location prediction. Tapping Next advances to a birth-chart summary that echoes
+the entered date/time/location, confirming all values were accepted.
+
 ## Components (Approach A — one page object per screen)
 
 ### Interfaces (`core/src/main/java/com/align/pages/`)
@@ -93,6 +111,14 @@ public interface SignupPage {
 public interface NamePage {
     boolean isNameScreenVisible();
     void enterName(String name);
+    void tapNext();
+}
+
+public interface BirthDetailsPage {
+    boolean isBirthDetailsScreenVisible();
+    void setBirthDate();                 // accepts the shown date
+    void setBirthTime();                 // accepts the shown time
+    void setBirthLocation(String city);  // searches and selects the first match
     void tapNext();
 }
 ```
@@ -131,6 +157,8 @@ public static SplashCarouselPage getSplashCarouselPage(){ return create("SplashC
   - enter random email (`qa_<uuid8>@example.com`) + password (`Pass<uuid6>!`), `tapSignup()`
   - assert `namePage.isNameScreenVisible()`
   - enter random name (`QA <uuid5>`), `tapNext()`
+  - assert `birthPage.isBirthDetailsScreenVisible()`
+  - `setBirthDate()`, `setBirthTime()`, `setBirthLocation("London")`, `tapNext()`
 
 ## Error handling
 

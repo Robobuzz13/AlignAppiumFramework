@@ -1,6 +1,7 @@
 package com.align.tests;
 
 import com.align.factory.PageFactory;
+import com.align.pages.BirthDetailsPage;
 import com.align.pages.InsightPage;
 import com.align.pages.NamePage;
 import com.align.pages.SignupPage;
@@ -17,11 +18,11 @@ public class OnboardingFlowTest extends BaseTest {
     // Guards the swipe loop so a missing signup screen fails fast instead of looping forever.
     private static final int MAX_SPLASH_SWIPES = 10;
 
-    @Test(description = "Onboarding: Next -> splash carousel -> swipe all -> signup -> name -> Next")
+    @Test(description = "Onboarding: Next -> splash -> signup -> name -> birth details -> Next")
     @Description("Validates the full onboarding hand-off: insight Next button navigates to the "
             + "splash carousel with a Skip button and multiple options, swipes through every splash "
-            + "screen to the signup screen, enters a random email/password and taps Signup, then "
-            + "enters a random name and taps Next")
+            + "screen to the signup screen, enters a random email/password and taps Signup, enters "
+            + "a random name and taps Next, then fills birth date/time/location and taps Next")
     public void onboardingThroughSignup() {
         InsightPage insightPage = PageFactory.getInsightPage();
         Assert.assertTrue(insightPage.isNextButtonVisible(), "Next button should be visible on insight screen");
@@ -41,6 +42,10 @@ public class OnboardingFlowTest extends BaseTest {
         NamePage namePage = PageFactory.getNamePage();
         Assert.assertTrue(namePage.isNameScreenVisible(), "Name screen should be visible after signup");
         enterRandomNameAndContinue(namePage);
+
+        BirthDetailsPage birthPage = PageFactory.getBirthDetailsPage();
+        Assert.assertTrue(birthPage.isBirthDetailsScreenVisible(), "Birth details screen should be visible after name");
+        fillBirthDetailsAndContinue(birthPage);
     }
 
     @Step("Tap Next to advance to splash carousel")
@@ -71,5 +76,13 @@ public class OnboardingFlowTest extends BaseTest {
         String name = "QA " + UUID.randomUUID().toString().substring(0, 5);
         namePage.enterName(name);
         namePage.tapNext();
+    }
+
+    @Step("Fill birth date/time/location and tap Next")
+    private void fillBirthDetailsAndContinue(BirthDetailsPage birthPage) {
+        birthPage.setBirthDate();
+        birthPage.setBirthTime();
+        birthPage.setBirthLocation("London");
+        birthPage.tapNext();
     }
 }
