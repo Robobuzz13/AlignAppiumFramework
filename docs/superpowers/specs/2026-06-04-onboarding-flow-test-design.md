@@ -30,6 +30,8 @@ Test assertion chain:
     settings.
 14. The Location toggle is switched on and **Back** returns to the app (which lands back on
     the Location Access screen, now satisfiable).
+15. With location enabled, **Continue** advances past the Location Access screen to the
+    interests-selection screen.
 
 ## Locators (captured live via `adb uiautomator dump`)
 
@@ -173,6 +175,16 @@ if off (idempotent). `returnToApp` presses the Android Back key via
 Verified live: the toggle flipped Off→On (`checked` false→true) and Back returned to the app,
 landing on the Location Access screen (now satisfiable, since location is enabled).
 
+### Advancing past Location Access
+
+Once location is enabled, the existing `LocationAccessPage.tapContinue()` advances past the
+screen (no permission re-prompt) to the interests-selection screen ("What brings you to the
+align27 app today?"). The transition needs a brief moment while the app acquires a location
+fix; the test relies on `isLocationAccessDisplayed()`'s built-in `isElementVisible` wait to
+absorb that delay (asserting the screen is *gone* after Continue). Verified live: Continue
+advanced to the interests screen (`rvInsightsList` with options such as "Explore My Birth
+Chart", "Understand My Future", and a `txtSubmit` Continue button).
+
 ## Components (Approach A — one page object per screen)
 
 ### Interfaces (`core/src/main/java/com/align/pages/`)
@@ -279,6 +291,7 @@ public static SplashCarouselPage getSplashCarouselPage(){ return create("SplashC
   - `PermissionUtils.allowPermission(driver)` to dismiss the system permission dialog
   - assert `gpsDialog.isGpsDialogDisplayed()`, `tapYes()`
   - assert `locationSettings.isLocationSettingsDisplayed()`, `enableLocation()`, `returnToApp()`
+  - assert back on Location Access, `tapContinue()`, assert Location Access dismissed
 
 ## Error handling
 

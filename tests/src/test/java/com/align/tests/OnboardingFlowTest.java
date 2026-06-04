@@ -87,6 +87,13 @@ public class OnboardingFlowTest extends BaseTest {
                 "System Location settings should open after tapping YES on the GPS dialog");
         locationSettings.enableLocation();
         locationSettings.returnToApp();
+
+        // Back on the Location Access screen with location now enabled; Continue advances past it.
+        Assert.assertTrue(locationPage.isLocationAccessDisplayed(),
+                "App should return to the Location Access screen after enabling GPS");
+        locationPage.tapContinue();
+        Assert.assertFalse(locationPage.isLocationAccessDisplayed(),
+                "Location Access screen should be dismissed once GPS is enabled and Continue is tapped");
     }
 
     @Step("Allow the system location permission")
