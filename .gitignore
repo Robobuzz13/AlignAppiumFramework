@@ -29,3 +29,7 @@ Thumbs.db
 
 # Logs
 *.log
+
+# Allure CLI download + raw results
+tests/.allure/
+tests/allure-results/

@@ -307,6 +307,16 @@ public static InsightPage getInsightPage()             { return create("InsightP
 public static SplashCarouselPage getSplashCarouselPage(){ return create("SplashCarouselPage"); }
 ```
 
+### Steps / Test separation
+
+The flow is split into two layers:
+
+- `com.align.steps.OnboardingSteps` — one public Allure `@Step` method per screen, each doing
+  that screen's assertion + interaction (fetching its own page via `PageFactory`). Reusable
+  across tests. Kept in test sources so TestNG `Assert` is on the classpath.
+- `com.align.tests.OnboardingFlowTest` — holds only the `@Test` method, which orchestrates the
+  sequence of steps. No `@Step` methods, no page handling, no assertions inline.
+
 ### Test (`tests/src/test/java/com/align/tests/OnboardingFlowTest.java`)
 
 `OnboardingFlowTest extends BaseTest`:

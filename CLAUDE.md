@@ -8,23 +8,37 @@ AlignAppiumFramework — dual-platform (Android + iOS) native mobile test automa
 
 ## Build & Run
 
-Maven is at `D:\TestingTools\apache-maven-3.9.16\bin` (not on system PATH). Each shell session:
-
-```powershell
-$env:PATH += ";D:\TestingTools\apache-maven-3.9.16\bin"
-```
+Requires Maven 3.9+ and a JDK 17+ on `PATH`. (If Maven is installed to a custom location,
+add its `bin` to `PATH` for the session.)
 
 | Action | Command |
 |--------|---------|
 | Compile all modules | `mvn compile -pl core,android,ios,tests` |
 | Compile test sources | `mvn test-compile -pl tests` |
-| Run unit tests (core) | `mvn test -pl core` |
-| Run Android suite (local) | `mvn test -pl tests -Dplatform=android -Denv=local -Dapp.path=/path/align.apk -Dsuite=src/test/resources/suites/android-suite.xml` |
-| Run iOS suite (local) | `mvn test -pl tests -Dplatform=ios -Denv=local -Dapp.path=/path/align.app -Dsuite=src/test/resources/suites/ios-suite.xml` |
-| Both parallel (cloud) | `mvn test -pl tests -Dplatform=both -Denv=cloud -Dapp.path=bs://id -Dsuite=src/test/resources/suites/parallel-suite.xml` |
-| Allure report | `mvn allure:report -pl tests` |
+| Allure report | `mvn allure:report -pl tests` (then `mvn allure:serve -pl tests` to view) |
 
-On-device test execution needs: running Appium server (or `auto.start.server=true`), connected device/emulator, real app binary, and real locators (current ones are placeholders).
+**Running a suite — install dependency modules first, then run `tests`.** `mvn test -pl tests`
+alone does not build/resolve `core`/`android`/`ios`, so `PageFactory`'s reflection can't load
+the page objects at runtime. Install once, then run:
+
+```
+mvn install -pl core,android,ios -DskipTests
+mvn test -pl tests -Dplatform=android -Denv=local <app flags> -Dsuite=src/test/resources/suites/android-suite.xml
+```
+
+**App flags** — supply the app one of two ways:
+- Installed app: `-Dapp.package=<pkg> -Dapp.activity=<launcher.activity>`
+- App binary: `-Dapp.path=/path/app.apk` (or `.app`, download URL, or `bs://id` for cloud)
+
+| Scenario | App flags + suite |
+|--------|---------|
+| Android, installed app | `-Dapp.package=com.example.app -Dapp.activity=com.example.app.MainActivity -Dsuite=…/android-suite.xml` |
+| Android, apk | `-Dapp.path=/path/app.apk -Dsuite=…/android-suite.xml` |
+| iOS, local | `-Dplatform=ios -Dapp.path=/path/app.app -Dsuite=…/ios-suite.xml` |
+| Both, cloud | `-Dplatform=both -Denv=cloud -Dapp.path=bs://id -Dsuite=…/parallel-suite.xml` |
+
+On-device execution needs: a running Appium server (or `auto.start.server=true`), a connected
+device/emulator, the app installed or a binary, and real locators in the page objects.
 
 ## Module Layout & Dependency Direction
 
@@ -47,16 +61,40 @@ core  ←  android  ←┐
 - **Waits:** all waits go through `WaitUtils`. No `Thread.sleep()` (the one polling loop in `ContextUtils.waitForWebViewContext` is the documented exception).
 - **Utils:** static methods taking `AppiumDriver` as first param. Platform-only methods guard with `instanceof` and throw `UnsupportedOperationException` (or log-warn for best-effort ops like keyboard).
 - **Config priority:** CLI `-D` > env var (UPPER_SNAKE) > properties file > default. All reads through `ConfigLoader.getInstance()`.
-- **Reporting:** `TestListener` captures one screenshot on failure, shares to both Allure + Extent. Video via `VideoUtils` (config-gated, auto-off on cloud).
+- **Reporting:** `TestListener` captures one screenshot on failure, shared to both Allure + Extent. `@Step` methods (Allure) are mirrored into Extent by `ExtentStepListener` (an Allure `StepLifecycleListener` registered via `META-INF/services`), so both reports show the step breakdown. Optional per-step screenshots: `-Dscreenshot.each.step=true`. Video via `VideoUtils` (config-gated, auto-off on cloud; keep on pass with `-Dvideo.save.on.pass=true`).
+- **Steps layer:** keep `@Test` methods thin — put per-screen actions/assertions in `@Step` methods in a separate steps class (e.g. `com.align.steps.*`); the test only orchestrates the sequence.
 
-## Environment Gotchas (Critical)
+## Version Compatibility Notes (Critical)
 
-This machine runs **JDK 26** + **java-client 9.2.3** + **Selenium 4.44**. These caused real breakage — do not reintroduce:
+Dependency versions are pinned in the root `pom.xml`. These combinations caused real breakage —
+do not reintroduce them when bumping versions:
 
-1. **No Lombok.** JDK 26 removed `com.sun.tools.javac.code.TypeTag.UNKNOWN`; Lombok 1.18.x crashes the compiler. `DeviceConfig` uses a hand-written builder. Do not add Lombok back unless on a Lombok release that supports JDK 26.
-2. **Cannot cast to `AndroidDriver`/`IOSDriver` for context/location.** Selenium 4.44 removed `ContextAware` and `html5.LocationContext`; those driver classes transitively reference them, so the cast fails at compile. Use capability **interfaces** instead: `InteractsWithApps`, `HasClipboard`, `PushesFiles`/`PullsFiles`, `HidesKeyboard`, `LocksDevice`, `SupportsRotation`, `HasNetworkConnection`, `HasNotifications`, `AuthenticatesByFinger`. For context switching use `driver.execute(MobileCommand.*)`.
-3. **Screen-recording option packages** (`android.screenrecording`, `ios.screenrecording`) don't exist in 9.x — use no-arg `startRecordingScreen()`.
-4. **Platform class-name prefix:** iOS classes are `IOS*` not `Ios*`. `PageFactory` maps `ios → IOS`.
+1. **Selenium ↔ java-client.** java-client 9.2.3's `SupportsContextSwitching` extends
+   `org.openqa.selenium.ContextAware`, which later Selenium 4.x releases removed. If Maven
+   resolves a Selenium version without that class, `AndroidDriver`/`IOSDriver` fail to load at
+   runtime (`NoClassDefFoundError: ContextAware`). The pom pins `selenium.version` to a release
+   that still ships it (java-client's declared floor). Keep Selenium and java-client compatible
+   when upgrading either.
+2. **No Lombok on newer JDKs.** Recent JDKs removed `com.sun.tools.javac.code.TypeTag.UNKNOWN`;
+   Lombok 1.18.x crashes the compiler. `DeviceConfig` uses a hand-written builder. Only add Lombok
+   back on a Lombok release that supports the JDK in use.
+3. **aspectjweaver must match the running JDK.** Allure's `@Step` weaving runs the aspectjweaver
+   javaagent; an older weaver cannot parse a newer JDK's bytecode (`Unsupported class file major
+   version N`) and silently disables step weaving. `aspectjweaver.version` is a pom property —
+   bump it to the latest when running on a newer JDK.
+4. **Don't cast to `AndroidDriver`/`IOSDriver` for context/location** in core utils. Some Selenium
+   versions remove `ContextAware`/`html5.LocationContext`, breaking the cast at compile. Use
+   capability **interfaces**: `InteractsWithApps`, `HasClipboard`, `PushesFiles`/`PullsFiles`,
+   `HidesKeyboard`, `LocksDevice`, `SupportsRotation`, `HasNetworkConnection`, `HasNotifications`,
+   `AuthenticatesByFinger`. For context switching use `driver.execute(MobileCommand.*)`.
+5. **Screen-recording option packages** (`android.screenrecording`, `ios.screenrecording`) don't
+   exist in java-client 9.x — use no-arg `startRecordingScreen()`.
+6. **Platform class-name prefix:** iOS classes are `IOS*` not `Ios*`. `PageFactory` maps `ios → IOS`.
+
+### Soft-keyboard covering buttons (Android)
+
+After typing into a field, the soft keyboard can cover a button below it and make it "not
+clickable". Hide the keyboard before tapping such a button (`KeyboardUtils.hideKeyboard(getDriver())`).
 
 ## Adding a New Screen (Pattern)
 
@@ -64,7 +102,14 @@ This machine runs **JDK 26** + **java-client 9.2.3** + **Selenium 4.44**. These 
 2. `android/.../pages/AndroidXxxPage.java` extends `BasePage` implements `XxxPage` (resource-id locators)
 3. `ios/.../pages/IOSXxxPage.java` extends `BasePage` implements `XxxPage` (XCUITest locators)
 4. Add `getXxxPage()` to `tests/.../factory/PageFactory.java`
-5. Write test in `tests/.../tests/` extending `BaseTest`, call `PageFactory.getXxxPage()`
+5. Add a `@Step` method that drives the screen in the steps class; the `@Test` calls it
+
+**Reusable screens:** when several screens share one widget (e.g. a single-select list used for
+multiple questions), model them with one generic page object and identify the specific instance
+by a stable text/title rather than creating a page object per screen.
+
+**OS-level dialogs** (runtime permission, "enable GPS", system settings) vary by device and OS
+version — handle them best-effort (act if present, skip if not) so the test stays portable.
 
 ## Workflow
 

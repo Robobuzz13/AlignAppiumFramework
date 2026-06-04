@@ -5,6 +5,8 @@ public class DeviceConfig {
     private String deviceName;
     private String udid;
     private String appPath;
+    private String appPackage;
+    private String appActivity;
     private String platformVersion;
     private String executionEnv;
     private String cloudUrl;
@@ -20,6 +22,8 @@ public class DeviceConfig {
                 .deviceName(cfg.getProperty("device.name", ""))
                 .udid(cfg.getProperty("device.udid", ""))
                 .appPath(cfg.getProperty("app.path", ""))
+                .appPackage(cfg.getProperty("app.package", ""))
+                .appActivity(cfg.getProperty("app.activity", ""))
                 .platformVersion(cfg.getProperty("platform.version", ""))
                 .executionEnv(cfg.getProperty("env", "local"))
                 .cloudUrl(cfg.getProperty("cloud.url", ""))
@@ -36,6 +40,8 @@ public class DeviceConfig {
     public String getDeviceName()      { return deviceName; }
     public String getUdid()            { return udid; }
     public String getAppPath()         { return appPath; }
+    public String getAppPackage()      { return appPackage; }
+    public String getAppActivity()     { return appActivity; }
     public String getPlatformVersion() { return platformVersion; }
     public String getExecutionEnv()    { return executionEnv; }
     public String getCloudUrl()        { return cloudUrl; }
@@ -53,6 +59,8 @@ public class DeviceConfig {
         public Builder deviceName(String v)      { c.deviceName = v;      return this; }
         public Builder udid(String v)            { c.udid = v;            return this; }
         public Builder appPath(String v)         { c.appPath = v;         return this; }
+        public Builder appPackage(String v)      { c.appPackage = v;      return this; }
+        public Builder appActivity(String v)     { c.appActivity = v;     return this; }
         public Builder platformVersion(String v) { c.platformVersion = v; return this; }
         public Builder executionEnv(String v)    { c.executionEnv = v;    return this; }
         public Builder cloudUrl(String v)        { c.cloudUrl = v;        return this; }

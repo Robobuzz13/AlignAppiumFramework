@@ -7,7 +7,8 @@ Dual-platform (Android + iOS) native mobile test automation framework built on *
 - **Cross-platform, single test layer** — interface-driven page objects; the same test runs on Android and iOS.
 - **Full parallel execution** — ThreadLocal driver management. Run the same test on N devices, or Android + iOS simultaneously, configured purely in TestNG XML.
 - **Local + cloud** — local emulators/simulators for dev, cloud farm (BrowserStack/Sauce) for CI; switched by one flag.
-- **Dual reporting** — Allure + ExtentReports, single screenshot on failure shared to both.
+- **Dual reporting** — Allure + ExtentReports with a shared `@Step` breakdown; a failure screenshot goes to both, and per-step screenshots are an opt-in flag.
+- **Thin tests + steps layer** — `@Test` methods orchestrate; per-screen actions/assertions live as `@Step` methods in a steps class.
 - **Video recording** — optional, config-gated, auto-disabled on cloud (farms record themselves).
 - **App binary flexibility** — local path, download URL, or cloud app ID per run.
 - **16 utility classes** — gestures, keyboard, alerts, permissions, app/device/network control, clipboard, files, biometrics, deep links, WebView context, elements, notifications, screenshots, video.
@@ -17,11 +18,14 @@ Dual-platform (Android + iOS) native mobile test automation framework built on *
 
 | Tool | Version |
 |------|---------|
-| JDK | 17+ (tested on 26) |
+| JDK | 17+ |
 | Maven | 3.9+ |
-| Appium | 2.x server + UiAutomator2 (Android) / XCUITest (iOS) drivers |
+| Appium | 2.x+ server + UiAutomator2 (Android) / XCUITest (iOS) drivers |
 | Android | SDK + emulator/device |
 | iOS | Xcode + simulator/device (macOS only) |
+
+> Newer JDKs: the `selenium.version` and `aspectjweaver.version` pom properties may need to stay
+> compatible with the JDK and java-client in use — see [CLAUDE.md](CLAUDE.md) version notes.
 
 ## Project Structure
 
@@ -41,22 +45,28 @@ Dependency direction: `android`/`ios` → `core`; `tests` → `android`+`ios`. `
 ## Quick Start
 
 ```bash
-# 1. Build
-mvn install -DskipTests -pl core,android,ios,tests
+# 1. Install the dependency modules (so PageFactory's reflection can load page objects at runtime)
+mvn install -pl core,android,ios -DskipTests
 
-# 2. Start Appium server (or set auto.start.server=true)
+# 2. Start an Appium server (or set auto.start.server=true)
 appium
 
-# 3. Run Android tests locally
+# 3a. Run against an already-installed Android app
 mvn test -pl tests \
-  -Dplatform=android \
-  -Denv=local \
-  -Ddevice.name="Pixel_7_API_33" \
-  -Dapp.path=/path/to/align.apk \
+  -Dplatform=android -Denv=local \
+  -Dapp.package=com.example.app \
+  -Dapp.activity=com.example.app.MainActivity \
+  -Dsuite=src/test/resources/suites/android-suite.xml
+
+# 3b. ...or against an apk binary
+mvn test -pl tests \
+  -Dplatform=android -Denv=local \
+  -Dapp.path=/path/to/app.apk \
   -Dsuite=src/test/resources/suites/android-suite.xml
 ```
 
-> Windows: Maven here lives at `D:\TestingTools\apache-maven-3.9.16\bin`. Add to PATH or prefix per session: `$env:PATH += ";D:\TestingTools\apache-maven-3.9.16\bin"`.
+> `mvn test -pl tests` alone won't resolve `core`/`android`/`ios` — run the install step first
+> (or use `mvn install` at the root). If Maven lives in a custom location, add its `bin` to `PATH`.
 
 ## Configuration
 
@@ -78,10 +88,13 @@ Common flags:
 | `-Dplatform` | `android` / `ios` / `both` | Target platform |
 | `-Denv` | `local` / `cloud` | Execution environment |
 | `-Dapp.path` | path / URL / `bs://id` | App binary |
+| `-Dapp.package` | package id | Launch an already-installed app (with `-Dapp.activity`) |
+| `-Dapp.activity` | launcher activity | Entry activity for an installed app |
 | `-Dapp.url` | URL | Download binary before run |
 | `-Dsuite` | suite xml path | TestNG suite |
 | `-Dvideo.recording.enabled` | `true` / `false` | Screen recording |
 | `-Dvideo.save.on.pass` | `true` / `false` | Keep video on pass (default: fail only) |
+| `-Dscreenshot.each.step` | `true` / `false` | Attach a screenshot after every `@Step` (default false) |
 
 ## Parallel Execution
 
@@ -98,11 +111,14 @@ Configured in TestNG suite XML — no code changes:
 
 | Report | Location |
 |--------|----------|
-| Allure results | `tests/target/allure-results/` → `mvn allure:report -pl tests` |
+| Allure results | `tests/allure-results/` → `mvn allure:report -pl tests`, view with `mvn allure:serve -pl tests` |
 | Extent HTML | `tests/target/extent-reports/report.html` |
 | Screenshots (failures) | `tests/target/screenshots/` |
 | Videos | `tests/target/videos/` |
 | Logs | `tests/target/logs/` |
+
+Both Allure and Extent show the same `@Step` breakdown (steps are mirrored into Extent). With
+`-Dscreenshot.each.step=true`, every step also carries a screenshot in both reports.
 
 ## CI/CD
 
@@ -111,25 +127,45 @@ Configured in TestNG suite XML — no code changes:
 
 ## Writing Tests
 
-Tests target the `LoginPage`-style interface and never know the platform:
+Tests target platform-agnostic page interfaces and never know the platform. Keep `@Test` methods
+thin — put per-screen actions/assertions in `@Step` methods in a steps class, and have the test
+orchestrate them:
 
 ```java
+// steps class (com.align.steps)
+public class OnboardingSteps {
+    @Step("Verify the login screen and sign in")
+    public void signIn(String user, String pass) {
+        LoginPage login = PageFactory.getLoginPage();   // returns Android or iOS impl
+        Assert.assertTrue(login.isDisplayed());
+        login.enterUsername(user);
+        login.enterPassword(pass);
+        login.tapLogin();
+    }
+}
+
+// test class — orchestration only
 public class LoginTest extends BaseTest {
+    private final OnboardingSteps steps = new OnboardingSteps();
+
     @Test
     public void validLogin() {
-        LoginPage login = PageFactory.getLoginPage();   // returns Android or iOS impl
-        login.enterUsername("user@align.com");
-        login.enterPassword("Password123!");
-        login.tapLogin();
+        steps.signIn("user@example.com", "Password123!");
     }
 }
 ```
 
-To add a screen: define the interface in `core`, implement `Android*`/`IOS*` in the platform modules, register a getter in `PageFactory`. See [CLAUDE.md](CLAUDE.md) for the full pattern and environment gotchas.
+To add a screen: define the interface in `core`, implement `Android*`/`IOS*` in the platform
+modules, register a getter in `PageFactory`, and add a `@Step` that drives it. See
+[CLAUDE.md](CLAUDE.md) for the full pattern and version-compatibility notes.
 
 ## Status
 
-Framework compiles clean (core + android + ios + tests). Sample `LoginTest` included with **placeholder locators** — replace `AndroidLoginPage` / `IOSLoginPage` locators with real app IDs before running on-device.
+Framework compiles clean (core + android + ios + tests). Includes an end-to-end onboarding test
+(`OnboardingFlowTest`, driven by `OnboardingSteps`) exercising ~14 screens — text entry, carousel
+swipes, native pickers, place autocomplete, OS permission/GPS dialogs, and a final paywall check —
+with Allure + Extent step reporting, optional per-step screenshots, and optional video. Replace the
+page-object locators with your app's real IDs before running on-device.
 
 ## Docs
 

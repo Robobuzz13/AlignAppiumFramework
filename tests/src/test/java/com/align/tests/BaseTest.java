@@ -68,6 +68,8 @@ public class BaseTest {
                 .deviceName(cfg.getProperty("device.name", ""))
                 .udid(cfg.getProperty("device.udid", ""))
                 .appPath(appPath)
+                .appPackage(cfg.getProperty("app.package", ""))
+                .appActivity(cfg.getProperty("app.activity", ""))
                 .platformVersion(cfg.getProperty("platform.version", ""))
                 .executionEnv(cfg.getProperty("env", "local"))
                 .cloudUrl(cfg.getProperty("cloud.url", ""))
