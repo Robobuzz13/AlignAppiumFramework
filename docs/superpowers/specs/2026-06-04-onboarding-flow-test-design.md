@@ -78,9 +78,23 @@ user by name ("Good Evening 🌙 &lt;name&gt;") — confirming the value was acc
 | Places result  | `com.dailyinsights:id/places_autocomplete_prediction_primary_text` | first row selects the city |
 | Next           | `com.dailyinsights:id/imgNext`         | advances to the birth-chart summary |
 
-The page object accepts the date/time pickers' shown values (taps `ButtonSet`) and selects
-the first location prediction. Tapping Next advances to a birth-chart summary that echoes
-the entered date/time/location, confirming all values were accepted.
+The page object sets a **random past date** and a **random time**, then selects the first
+location prediction:
+
+- **Date** — the three NumberPicker spinners (`android:id/numberpicker_input`, order
+  month/day/year) ignore typed text, so the page object scrolls each column down a random
+  number of steps (year 20–45 back) via vertical swipes. Exact value is not targeted — any
+  past date is acceptable — which avoids the off-by-one oscillation an exact-target loop hits
+  when a fling moves more than one step. `ButtonSet` confirms.
+- **Time** — `editTextHours` / `editTextMinutes` are plain EditText fields; the page object
+  `sendKeys` a random 24-hour time (`clear()` then type) and confirms with `ButtonSet`.
+
+Tapping Next advances to a birth-chart summary that echoes the entered date/time/location,
+confirming all values were accepted.
+
+Swipe mechanics on the NumberPicker were verified live via adb (a downward swipe spanning
+wider than the EditText scrolls one or more steps); the Appium-driver swipe path
+(`GestureUtils.swipe`) is not yet runtime-verified against an Appium session.
 
 ## Components (Approach A — one page object per screen)
 
@@ -116,8 +130,8 @@ public interface NamePage {
 
 public interface BirthDetailsPage {
     boolean isBirthDetailsScreenVisible();
-    void setBirthDate();                 // accepts the shown date
-    void setBirthTime();                 // accepts the shown time
+    void setBirthDate();                 // random past date (swipes the spinners)
+    void setBirthTime();                 // random time (types hours/minutes)
     void setBirthLocation(String city);  // searches and selects the first match
     void tapNext();
 }
