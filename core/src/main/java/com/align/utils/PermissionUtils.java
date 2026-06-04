@@ -60,6 +60,8 @@ public class PermissionUtils {
             String cmd = "pm reset-permissions " + packageName;
             ((AndroidDriver) driver).executeScript("mobile: shell", Map.of("command", cmd));
             log.info("Reset permissions for {}", packageName);
+        } else {
+            log.warn("resetPermissions() is Android-only — skipped");
         }
     }
 }

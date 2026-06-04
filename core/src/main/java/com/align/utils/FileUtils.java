@@ -30,6 +30,7 @@ public class FileUtils {
         return data;
     }
 
+    // Android only — pushes to /sdcard/Pictures/ for media scanner pickup
     public static void pushMediaFile(AppiumDriver driver, String localPath) {
         String fileName = new File(localPath).getName();
         pushFileToDevice(driver, localPath, "/sdcard/Pictures/" + fileName);
