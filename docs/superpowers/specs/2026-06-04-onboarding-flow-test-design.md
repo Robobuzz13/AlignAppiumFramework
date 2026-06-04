@@ -26,6 +26,8 @@ Test assertion chain:
     permission dialog.
 12. The system permission dialog is allowed via `PermissionUtils.allowPermission`, returning
     to the app (which then shows an app-level GPS-enable dialog).
+13. The GPS-enable dialog is displayed; tapping **YES** opens the Android system Location
+    settings.
 
 ## Locators (captured live via `adb uiautomator dump`)
 
@@ -143,6 +145,21 @@ and `denyPermission`, making permission handling work across Android versions. V
 live: a single Allow tap returned to the app, which then showed an app-level "Your GPS seems
 to be disabled" dialog (`android:id/button1` YES / `button2` NO) — the next screen in the flow.
 
+### Screen I — GPS-enable dialog (post-permission, app AlertDialog)
+
+| Element | Locator (resource-id)   | Type   |
+|---------|-------------------------|--------|
+| Message | `android:id/message`    | TextView ("Your GPS seems to be disabled, do you want to enable it?") |
+| YES     | `android:id/button1`    | Button |
+| NO      | `android:id/button2`    | Button |
+
+This is a standard Android `AlertDialog` (view-based, not a WebDriver alert), so `GpsDialogPage`
+taps the buttons by id rather than using `AlertUtils.acceptAlert`. `isGpsDialogDisplayed`
+confirms the dialog by checking the message text contains "GPS" (the `button1`/`message` ids are
+generic to all AlertDialogs). Verified live: tapping YES opens the Android system Location
+settings (`com.android.settings` `LocationSettingsActivity`, `switch_widget` "Location, Off") —
+enabling the toggle and returning to the app is the next step.
+
 ## Components (Approach A — one page object per screen)
 
 ### Interfaces (`core/src/main/java/com/align/pages/`)
@@ -192,6 +209,12 @@ public interface LocationAccessPage {
     boolean isLocationAccessDisplayed();
     void tapContinue();
 }
+
+public interface GpsDialogPage {
+    boolean isGpsDialogDisplayed();
+    void tapYes();
+    void tapNo();
+}
 ```
 
 ### Android impls (`android/.../pages/`) — real locators
@@ -234,6 +257,8 @@ public static SplashCarouselPage getSplashCarouselPage(){ return create("SplashC
   - `summaryPage.tapContinue()`
   - assert `chartInsight.isNextButtonVisible()` (reused `InsightPage`), `tapNext()`
   - assert `locationPage.isLocationAccessDisplayed()`, `tapContinue()`
+  - `PermissionUtils.allowPermission(driver)` to dismiss the system permission dialog
+  - assert `gpsDialog.isGpsDialogDisplayed()`, `tapYes()`
 
 ## Error handling
 

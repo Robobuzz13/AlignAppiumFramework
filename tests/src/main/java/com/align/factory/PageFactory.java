@@ -3,6 +3,7 @@ package com.align.factory;
 import com.align.config.ConfigLoader;
 import com.align.pages.BirthChartSummaryPage;
 import com.align.pages.BirthDetailsPage;
+import com.align.pages.GpsDialogPage;
 import com.align.pages.InsightPage;
 import com.align.pages.LocationAccessPage;
 import com.align.pages.LoginPage;
@@ -55,6 +56,10 @@ public class PageFactory {
 
     public static LocationAccessPage getLocationAccessPage() {
         return create("LocationAccessPage");
+    }
+
+    public static GpsDialogPage getGpsDialogPage() {
+        return create("GpsDialogPage");
     }
 
     @SuppressWarnings("unchecked")

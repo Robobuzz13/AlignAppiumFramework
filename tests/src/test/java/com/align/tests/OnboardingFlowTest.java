@@ -5,6 +5,7 @@ import com.align.factory.PageFactory;
 import com.align.utils.PermissionUtils;
 import com.align.pages.BirthChartSummaryPage;
 import com.align.pages.BirthDetailsPage;
+import com.align.pages.GpsDialogPage;
 import com.align.pages.InsightPage;
 import com.align.pages.LocationAccessPage;
 import com.align.pages.NamePage;
@@ -72,6 +73,12 @@ public class OnboardingFlowTest extends BaseTest {
 
         // Continue launches the Android system location-permission dialog; allow it.
         allowLocationPermission();
+
+        // The app then prompts to enable GPS; confirm with YES.
+        GpsDialogPage gpsDialog = PageFactory.getGpsDialogPage();
+        Assert.assertTrue(gpsDialog.isGpsDialogDisplayed(),
+                "GPS-enable dialog should be displayed after allowing location permission");
+        gpsDialog.tapYes();
     }
 
     @Step("Allow the system location permission")
