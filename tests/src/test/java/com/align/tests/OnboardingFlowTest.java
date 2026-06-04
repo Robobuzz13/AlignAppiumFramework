@@ -1,6 +1,8 @@
 package com.align.tests;
 
+import com.align.driver.DriverManager;
 import com.align.factory.PageFactory;
+import com.align.utils.PermissionUtils;
 import com.align.pages.BirthChartSummaryPage;
 import com.align.pages.BirthDetailsPage;
 import com.align.pages.InsightPage;
@@ -67,6 +69,14 @@ public class OnboardingFlowTest extends BaseTest {
         Assert.assertTrue(locationPage.isLocationAccessDisplayed(),
                 "Location Access screen should be displayed after the personalized insight");
         locationPage.tapContinue();
+
+        // Continue launches the Android system location-permission dialog; allow it.
+        allowLocationPermission();
+    }
+
+    @Step("Allow the system location permission")
+    private void allowLocationPermission() {
+        PermissionUtils.allowPermission(DriverManager.getDriver());
     }
 
     @Step("Tap Next to advance to splash carousel")

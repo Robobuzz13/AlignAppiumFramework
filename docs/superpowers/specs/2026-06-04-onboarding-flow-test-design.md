@@ -24,6 +24,8 @@ Test assertion chain:
     layout); **Next** advances to the Location Access permission screen.
 11. Location Access screen is displayed; **Continue** triggers the Android system location
     permission dialog.
+12. The system permission dialog is allowed via `PermissionUtils.allowPermission`, returning
+    to the app (which then shows an app-level GPS-enable dialog).
 
 ## Locators (captured live via `adb uiautomator dump`)
 
@@ -130,9 +132,16 @@ permission screen.
 The page object asserts the title text is "Location Access" and taps Continue. Continue
 launches the **Android system location-permission dialog**
 (`com.android.packageinstaller` `GrantPermissionsActivity`, with `permission_allow_button` /
-`permission_deny_button`). Handling that OS dialog is out of scope for this page object —
-it would be done via `PermissionUtils` / `AlertUtils` or the `autoGrantPermissions`
-capability, and is left as the next step.
+`permission_deny_button`). That OS dialog is handled by `PermissionUtils.allowPermission`,
+called from the test as a step (not modelled as an app page object, since it is an OS-level
+dialog).
+
+`PermissionUtils` originally only knew the Android 11+ dialog ids
+(`com.android.permissioncontroller`). This device (Samsung S10) uses the legacy
+`com.android.packageinstaller` ids, so those were added as a fallback to `allowPermission`
+and `denyPermission`, making permission handling work across Android versions. Verified
+live: a single Allow tap returned to the app, which then showed an app-level "Your GPS seems
+to be disabled" dialog (`android:id/button1` YES / `button2` NO) — the next screen in the flow.
 
 ## Components (Approach A — one page object per screen)
 
