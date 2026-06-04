@@ -32,6 +32,10 @@ Test assertion chain:
     the Location Access screen, now satisfiable).
 15. With location enabled, **Continue** advances past the Location Access screen to the
     interests-selection screen.
+16. An interest is selected and **Continue** advances to the "How did you hear about us?"
+    screen (the same single-select list widget).
+17. A source is selected and **Continue** advances to the subscription paywall, which is the
+    terminal screen of the modelled flow.
 
 ## Locators (captured live via `adb uiautomator dump`)
 
@@ -185,6 +189,33 @@ absorb that delay (asserting the screen is *gone* after Continue). Verified live
 advanced to the interests screen (`rvInsightsList` with options such as "Explore My Birth
 Chart", "Understand My Future", and a `txtSubmit` Continue button).
 
+### Screens K & L — Single-select list screens (`OptionListPage`)
+
+The onboarding asks a series of single-select questions that all share one widget: a header
+title, a `rvInsightsList` RecyclerView of options (each row `llRootlayer` with a `txtTitle`),
+a `txtSkip`, and a `txtSubmit` Continue button that enables once an option is chosen. Rather
+than one page object per question, a single generic `OptionListPage` models all of them:
+
+| Element       | Locator (resource-id)                  | Notes |
+|---------------|----------------------------------------|-------|
+| List          | `com.dailyinsights:id/rvInsightsList`  | presence = screen displayed |
+| Title/options | `com.dailyinsights:id/txtTitle`        | header is the first match; options matched by text via XPath |
+| Continue      | `com.dailyinsights:id/txtSubmit`       | enabled after a selection |
+
+`getTitle()` returns the first `txtTitle` (the header) to distinguish which question is shown.
+`selectOption(name)` taps the row whose `txtTitle` text equals `name`. Verified live for two
+screens — interests ("What brings you to the align27 app today?", selected "Explore My Birth
+Chart") and acquisition source ("How did you hear about us?", selected "Google Search"). Both
+enabled the Continue button on selection and advanced.
+
+### Terminal — Subscription paywall (`PaywallActivity`)
+
+After the source question, Continue opens a RevenueCat subscription paywall
+(`com.revenuecat.purchases.ui.revenuecatui.activity.PaywallActivity`): "Your Personal
+Astrologer", Yearly/Monthly plans, a 3-day free trial, and a purchase Continue. The paywall
+is a third-party screen whose elements carry no resource-ids, and advancing requires a real
+purchase, so it is the terminal screen of this test — not automated further.
+
 ## Components (Approach A — one page object per screen)
 
 ### Interfaces (`core/src/main/java/com/align/pages/`)
@@ -246,6 +277,13 @@ public interface LocationSettingsPage {
     void enableLocation();   // idempotent — toggles on only if off
     void returnToApp();      // Android Back
 }
+
+public interface OptionListPage {   // reused for every single-select list screen
+    boolean isDisplayed();
+    String getTitle();
+    void selectOption(String name);
+    void tapContinue();
+}
 ```
 
 ### Android impls (`android/.../pages/`) — real locators
@@ -292,6 +330,8 @@ public static SplashCarouselPage getSplashCarouselPage(){ return create("SplashC
   - assert `gpsDialog.isGpsDialogDisplayed()`, `tapYes()`
   - assert `locationSettings.isLocationSettingsDisplayed()`, `enableLocation()`, `returnToApp()`
   - assert back on Location Access, `tapContinue()`, assert Location Access dismissed
+  - assert `interestsPage.isDisplayed()`, `selectOption("Explore My Birth Chart")`, `tapContinue()`
+  - assert `sourcePage.isDisplayed()`, `selectOption("Google Search")`, `tapContinue()` (reaches paywall)
 
 ## Error handling
 

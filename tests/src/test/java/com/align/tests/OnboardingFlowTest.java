@@ -9,6 +9,7 @@ import com.align.pages.GpsDialogPage;
 import com.align.pages.InsightPage;
 import com.align.pages.LocationAccessPage;
 import com.align.pages.LocationSettingsPage;
+import com.align.pages.OptionListPage;
 import com.align.pages.NamePage;
 import com.align.pages.SignupPage;
 import com.align.pages.SplashCarouselPage;
@@ -94,6 +95,20 @@ public class OnboardingFlowTest extends BaseTest {
         locationPage.tapContinue();
         Assert.assertFalse(locationPage.isLocationAccessDisplayed(),
                 "Location Access screen should be dismissed once GPS is enabled and Continue is tapped");
+
+        // Interests-selection screen: pick an interest and continue.
+        OptionListPage interestsPage = PageFactory.getOptionListPage();
+        Assert.assertTrue(interestsPage.isDisplayed(),
+                "Interests-selection screen should be displayed after Location Access");
+        interestsPage.selectOption("Explore My Birth Chart");
+        interestsPage.tapContinue();
+
+        // "How did you hear about us?" — same single-select list screen, reused.
+        OptionListPage sourcePage = PageFactory.getOptionListPage();
+        Assert.assertTrue(sourcePage.isDisplayed(),
+                "How-did-you-hear screen should be displayed after interests");
+        sourcePage.selectOption("Google Search");
+        sourcePage.tapContinue();
     }
 
     @Step("Allow the system location permission")

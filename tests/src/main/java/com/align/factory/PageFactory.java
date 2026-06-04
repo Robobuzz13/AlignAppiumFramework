@@ -9,6 +9,7 @@ import com.align.pages.LocationAccessPage;
 import com.align.pages.LocationSettingsPage;
 import com.align.pages.LoginPage;
 import com.align.pages.NamePage;
+import com.align.pages.OptionListPage;
 import com.align.pages.SignupPage;
 import com.align.pages.SplashCarouselPage;
 
@@ -65,6 +66,10 @@ public class PageFactory {
 
     public static LocationSettingsPage getLocationSettingsPage() {
         return create("LocationSettingsPage");
+    }
+
+    public static OptionListPage getOptionListPage() {
+        return create("OptionListPage");
     }
 
     @SuppressWarnings("unchecked")
