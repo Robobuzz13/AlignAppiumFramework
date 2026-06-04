@@ -2,6 +2,7 @@ package com.align.tests;
 
 import com.align.factory.PageFactory;
 import com.align.pages.InsightPage;
+import com.align.pages.NamePage;
 import com.align.pages.SignupPage;
 import com.align.pages.SplashCarouselPage;
 import io.qameta.allure.Description;
@@ -16,10 +17,11 @@ public class OnboardingFlowTest extends BaseTest {
     // Guards the swipe loop so a missing signup screen fails fast instead of looping forever.
     private static final int MAX_SPLASH_SWIPES = 10;
 
-    @Test(description = "Onboarding: Next -> splash carousel -> swipe all -> signup with random credentials")
+    @Test(description = "Onboarding: Next -> splash carousel -> swipe all -> signup -> name -> Next")
     @Description("Validates the full onboarding hand-off: insight Next button navigates to the "
             + "splash carousel with a Skip button and multiple options, swipes through every splash "
-            + "screen to the signup screen, enters a random email/password and taps Signup")
+            + "screen to the signup screen, enters a random email/password and taps Signup, then "
+            + "enters a random name and taps Next")
     public void onboardingThroughSignup() {
         InsightPage insightPage = PageFactory.getInsightPage();
         Assert.assertTrue(insightPage.isNextButtonVisible(), "Next button should be visible on insight screen");
@@ -35,6 +37,10 @@ public class OnboardingFlowTest extends BaseTest {
         Assert.assertTrue(signupPage.isSignupScreenVisible(), "Signup screen should be visible after swiping splashes");
 
         signUpWithRandomCredentials(signupPage);
+
+        NamePage namePage = PageFactory.getNamePage();
+        Assert.assertTrue(namePage.isNameScreenVisible(), "Name screen should be visible after signup");
+        enterRandomNameAndContinue(namePage);
     }
 
     @Step("Tap Next to advance to splash carousel")
@@ -58,5 +64,12 @@ public class OnboardingFlowTest extends BaseTest {
         signupPage.enterEmail(email);
         signupPage.enterPassword(password);
         signupPage.tapSignup();
+    }
+
+    @Step("Enter random name and tap Next")
+    private void enterRandomNameAndContinue(NamePage namePage) {
+        String name = "QA " + UUID.randomUUID().toString().substring(0, 5);
+        namePage.enterName(name);
+        namePage.tapNext();
     }
 }

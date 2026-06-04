@@ -16,6 +16,7 @@ Test assertion chain:
 4. Splash carousel exposes more than one splash option (page-indicator dots).
 5. Swiping through every splash screen reaches the signup screen.
 6. Signup screen accepts a random email/password and the **Signup** button is tappable.
+7. Name screen accepts a random name and the **Next** button advances to birth details.
 
 ## Locators (captured live via `adb uiautomator dump`)
 
@@ -53,6 +54,16 @@ splash, the signup screen appears.
 Note: the app misspells the clickable button id as `txtSingup`. The correctly-spelled
 `txtSignup` is the non-clickable screen header — do not target it.
 
+### Screen D — Name (post-signup, `StartupActivity`)
+
+| Element     | Locator (resource-id)               | Type     |
+|-------------|-------------------------------------|----------|
+| Name field  | `com.dailyinsights:id/edtUserName`  | EditText |
+| Next button | `com.dailyinsights:id/txtContinue`  | TextView (clickable; same id as the insight-screen Next) |
+
+Entering a name and tapping Next advances to the birth-details screen, which greets the
+user by name ("Good Evening 🌙 &lt;name&gt;") — confirming the value was accepted.
+
 ## Components (Approach A — one page object per screen)
 
 ### Interfaces (`core/src/main/java/com/align/pages/`)
@@ -77,6 +88,12 @@ public interface SignupPage {
     void enterEmail(String email);
     void enterPassword(String password);
     void tapSignup();
+}
+
+public interface NamePage {
+    boolean isNameScreenVisible();
+    void enterName(String name);
+    void tapNext();
 }
 ```
 
@@ -112,6 +129,8 @@ public static SplashCarouselPage getSplashCarouselPage(){ return create("SplashC
   - swipe `swipeToNextSplash()` in a guarded loop (max 10) until `signupPage.isSignupScreenVisible()`
   - assert `signupPage.isSignupScreenVisible()`
   - enter random email (`qa_<uuid8>@example.com`) + password (`Pass<uuid6>!`), `tapSignup()`
+  - assert `namePage.isNameScreenVisible()`
+  - enter random name (`QA <uuid5>`), `tapNext()`
 
 ## Error handling
 

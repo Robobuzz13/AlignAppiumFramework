@@ -3,6 +3,7 @@ package com.align.factory;
 import com.align.config.ConfigLoader;
 import com.align.pages.InsightPage;
 import com.align.pages.LoginPage;
+import com.align.pages.NamePage;
 import com.align.pages.SignupPage;
 import com.align.pages.SplashCarouselPage;
 
@@ -35,6 +36,10 @@ public class PageFactory {
 
     public static SignupPage getSignupPage() {
         return create("SignupPage");
+    }
+
+    public static NamePage getNamePage() {
+        return create("NamePage");
     }
 
     @SuppressWarnings("unchecked")
