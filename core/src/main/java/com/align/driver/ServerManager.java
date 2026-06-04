@@ -10,7 +10,7 @@ import java.time.Duration;
 
 public class ServerManager {
     private static final Logger log = LoggerFactory.getLogger(ServerManager.class);
-    private static AppiumDriverLocalService service;
+    private static volatile AppiumDriverLocalService service;
 
     private ServerManager() {}
 

@@ -12,7 +12,7 @@ public class ConfigLoader {
     private static ConfigLoader instance;
     private final Properties props = new Properties();
 
-    public ConfigLoader(String fileName) {
+    ConfigLoader(String fileName) {
         loadFile(fileName);
     }
 

@@ -59,7 +59,10 @@ public class AppResolver {
             client.send(request, HttpResponse.BodyHandlers.ofFile(targetPath));
             log.info("App downloaded: {}", targetPath);
             return targetPath.toAbsolutePath().toString();
-        } catch (IOException | InterruptedException e) {
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new AppNotFoundException(url + " (download failed: interrupted)");
+        } catch (IOException e) {
             throw new AppNotFoundException(url + " (download failed: " + e.getMessage() + ")");
         }
     }
