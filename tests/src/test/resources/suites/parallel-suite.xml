@@ -9,14 +9,14 @@
     <test name="Android Tests" parallel="methods" thread-count="2">
         <parameter name="platform" value="android"/>
         <classes>
-            <class name="com.align.tests.LoginTest"/>
+            <class name="com.align.tests.OnboardingFlowTest"/>
         </classes>
     </test>
 
     <test name="iOS Tests" parallel="methods" thread-count="2">
         <parameter name="platform" value="ios"/>
         <classes>
-            <class name="com.align.tests.LoginTest"/>
+            <class name="com.align.tests.OnboardingFlowTest"/>
         </classes>
     </test>
 </suite>

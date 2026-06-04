@@ -8,7 +8,7 @@
     <parameter name="platform" value="android"/>
     <test name="Android Tests">
         <classes>
-            <class name="com.align.tests.LoginTest"/>
+            <class name="com.align.tests.OnboardingFlowTest"/>
         </classes>
     </test>
 </suite>
