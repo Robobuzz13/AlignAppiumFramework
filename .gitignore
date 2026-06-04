@@ -20,6 +20,9 @@ target/
 **/videos/
 **/logs/
 
+# Graphify knowledge graph output
+graphify-out/
+
 # OS
 .DS_Store
 Thumbs.db
