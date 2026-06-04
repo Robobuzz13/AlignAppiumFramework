@@ -30,5 +30,8 @@ public class OnboardingFlowTest extends BaseTest {
         steps.dismissInterstitialInsights();
         steps.selectOptionAndContinue("Explore My Birth Chart");
         steps.selectOptionAndContinue("Google Search");
+
+        // Final verification: onboarding ends on the subscription paywall.
+        steps.verifyPaymentPage();
     }
 }

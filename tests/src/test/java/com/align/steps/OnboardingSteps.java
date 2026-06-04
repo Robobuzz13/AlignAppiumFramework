@@ -10,6 +10,7 @@ import com.align.pages.LocationAccessPage;
 import com.align.pages.LocationSettingsPage;
 import com.align.pages.NamePage;
 import com.align.pages.OptionListPage;
+import com.align.pages.PaymentPage;
 import com.align.pages.SignupPage;
 import com.align.pages.SplashCarouselPage;
 import com.align.utils.PermissionUtils;
@@ -156,5 +157,12 @@ public class OnboardingSteps {
         Assert.assertTrue(listPage.isDisplayed(), "A single-select list screen should be displayed");
         listPage.selectOption(option);
         listPage.tapContinue();
+    }
+
+    @Step("Verify the payment / subscription paywall is displayed")
+    public void verifyPaymentPage() {
+        PaymentPage paymentPage = PageFactory.getPaymentPage();
+        Assert.assertTrue(paymentPage.isPaymentPageDisplayed(),
+                "The payment / subscription paywall should be displayed at the end of onboarding");
     }
 }
