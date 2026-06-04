@@ -4,6 +4,7 @@ import com.align.factory.PageFactory;
 import com.align.pages.BirthChartSummaryPage;
 import com.align.pages.BirthDetailsPage;
 import com.align.pages.InsightPage;
+import com.align.pages.LocationAccessPage;
 import com.align.pages.NamePage;
 import com.align.pages.SignupPage;
 import com.align.pages.SplashCarouselPage;
@@ -61,6 +62,11 @@ public class OnboardingFlowTest extends BaseTest {
         Assert.assertTrue(chartInsight.isNextButtonVisible(),
                 "Personalized insight screen should appear after chart generation");
         chartInsight.tapNext();
+
+        LocationAccessPage locationPage = PageFactory.getLocationAccessPage();
+        Assert.assertTrue(locationPage.isLocationAccessDisplayed(),
+                "Location Access screen should be displayed after the personalized insight");
+        locationPage.tapContinue();
     }
 
     @Step("Tap Next to advance to splash carousel")

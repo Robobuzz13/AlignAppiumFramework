@@ -4,6 +4,7 @@ import com.align.config.ConfigLoader;
 import com.align.pages.BirthChartSummaryPage;
 import com.align.pages.BirthDetailsPage;
 import com.align.pages.InsightPage;
+import com.align.pages.LocationAccessPage;
 import com.align.pages.LoginPage;
 import com.align.pages.NamePage;
 import com.align.pages.SignupPage;
@@ -50,6 +51,10 @@ public class PageFactory {
 
     public static BirthChartSummaryPage getBirthChartSummaryPage() {
         return create("BirthChartSummaryPage");
+    }
+
+    public static LocationAccessPage getLocationAccessPage() {
+        return create("LocationAccessPage");
     }
 
     @SuppressWarnings("unchecked")

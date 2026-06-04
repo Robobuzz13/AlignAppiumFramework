@@ -22,6 +22,8 @@ Test assertion chain:
 9. Birth-chart summary shows **Edit Birth Information** and **Continue** advances the flow.
 10. After chart generation a personalized insight screen appears (reuses the opening insight
     layout); **Next** advances to the Location Access permission screen.
+11. Location Access screen is displayed; **Continue** triggers the Android system location
+    permission dialog.
 
 ## Locators (captured live via `adb uiautomator dump`)
 
@@ -116,7 +118,21 @@ After the chart loads, the app shows a personalized insight screen that reuses t
 layout and resource-ids as the opening insight screen** (`imgTopIcon`, `txtContent`,
 `txtSubText`, `txtContinue`). No new page object is needed — `InsightPage` is reused. The
 test asserts the Next button is visible and taps it, which advances to the Location Access
-permission screen (the next screen in the flow, not yet modelled).
+permission screen.
+
+### Screen H — Location Access (post-insight, `StartupActivity`)
+
+| Element  | Locator (resource-id)              | Type     |
+|----------|------------------------------------|----------|
+| Title    | `com.dailyinsights:id/txtSignup`   | TextView (text "Location Access"; the id is reused, so confirm by text) |
+| Continue | `com.dailyinsights:id/txtContinue` | TextView (clickable) |
+
+The page object asserts the title text is "Location Access" and taps Continue. Continue
+launches the **Android system location-permission dialog**
+(`com.android.packageinstaller` `GrantPermissionsActivity`, with `permission_allow_button` /
+`permission_deny_button`). Handling that OS dialog is out of scope for this page object —
+it would be done via `PermissionUtils` / `AlertUtils` or the `autoGrantPermissions`
+capability, and is left as the next step.
 
 ## Components (Approach A — one page object per screen)
 
@@ -162,6 +178,11 @@ public interface BirthChartSummaryPage {
     boolean isEditBirthInfoDisplayed();
     void tapContinue();
 }
+
+public interface LocationAccessPage {
+    boolean isLocationAccessDisplayed();
+    void tapContinue();
+}
 ```
 
 ### Android impls (`android/.../pages/`) — real locators
@@ -203,6 +224,7 @@ public static SplashCarouselPage getSplashCarouselPage(){ return create("SplashC
   - assert `summaryPage.isEditBirthInfoDisplayed()`
   - `summaryPage.tapContinue()`
   - assert `chartInsight.isNextButtonVisible()` (reused `InsightPage`), `tapNext()`
+  - assert `locationPage.isLocationAccessDisplayed()`, `tapContinue()`
 
 ## Error handling
 
