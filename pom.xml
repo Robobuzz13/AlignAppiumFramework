@@ -36,6 +36,9 @@
         <slf4j.version>2.0.13</slf4j.version>
         <log4j.version>2.23.1</log4j.version>
         <mockito.version>5.11.0</mockito.version>
+        <!-- Allure's @Step weaving needs an aspectjweaver that understands the running JDK's
+             bytecode. 1.9.25 is the newest release (supports newer Java than the old 1.9.22). -->
+        <aspectjweaver.version>1.9.25</aspectjweaver.version>
     </properties>
 
     <dependencyManagement>
@@ -118,13 +121,13 @@
                             <app.path>${app.path}</app.path>
                             <video.recording.enabled>${video.recording.enabled}</video.recording.enabled>
                         </systemPropertyVariables>
-                        <argLine>-javaagent:${settings.localRepository}/org/aspectj/aspectjweaver/1.9.22/aspectjweaver-1.9.22.jar</argLine>
+                        <argLine>-javaagent:${settings.localRepository}/org/aspectj/aspectjweaver/${aspectjweaver.version}/aspectjweaver-${aspectjweaver.version}.jar</argLine>
                     </configuration>
                     <dependencies>
                         <dependency>
                             <groupId>org.aspectj</groupId>
                             <artifactId>aspectjweaver</artifactId>
-                            <version>1.9.22</version>
+                            <version>${aspectjweaver.version}</version>
                         </dependency>
                     </dependencies>
                 </plugin>
