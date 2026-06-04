@@ -6,6 +6,7 @@ import com.align.pages.BirthDetailsPage;
 import com.align.pages.GpsDialogPage;
 import com.align.pages.InsightPage;
 import com.align.pages.LocationAccessPage;
+import com.align.pages.LocationSettingsPage;
 import com.align.pages.LoginPage;
 import com.align.pages.NamePage;
 import com.align.pages.SignupPage;
@@ -60,6 +61,10 @@ public class PageFactory {
 
     public static GpsDialogPage getGpsDialogPage() {
         return create("GpsDialogPage");
+    }
+
+    public static LocationSettingsPage getLocationSettingsPage() {
+        return create("LocationSettingsPage");
     }
 
     @SuppressWarnings("unchecked")

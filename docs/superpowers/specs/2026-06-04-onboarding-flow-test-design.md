@@ -28,6 +28,8 @@ Test assertion chain:
     to the app (which then shows an app-level GPS-enable dialog).
 13. The GPS-enable dialog is displayed; tapping **YES** opens the Android system Location
     settings.
+14. The Location toggle is switched on and **Back** returns to the app (which lands back on
+    the Location Access screen, now satisfiable).
 
 ## Locators (captured live via `adb uiautomator dump`)
 
@@ -157,8 +159,19 @@ This is a standard Android `AlertDialog` (view-based, not a WebDriver alert), so
 taps the buttons by id rather than using `AlertUtils.acceptAlert`. `isGpsDialogDisplayed`
 confirms the dialog by checking the message text contains "GPS" (the `button1`/`message` ids are
 generic to all AlertDialogs). Verified live: tapping YES opens the Android system Location
-settings (`com.android.settings` `LocationSettingsActivity`, `switch_widget` "Location, Off") —
-enabling the toggle and returning to the app is the next step.
+settings (`com.android.settings` `LocationSettingsActivity`, `switch_widget` "Location, Off").
+
+### Screen J — System Location settings (cross-app, `com.android.settings`)
+
+| Element          | Locator (resource-id)                      | Type   |
+|------------------|--------------------------------------------|--------|
+| Location toggle  | `com.android.settings:id/switch_widget`    | Switch ("Location, Off"/"Location, On") |
+
+`LocationSettingsPage.enableLocation` reads the switch's `checked` attribute and taps it only
+if off (idempotent). `returnToApp` presses the Android Back key via
+`KeyboardUtils.pressBack` — Settings was launched from the app, so one Back returns to it.
+Verified live: the toggle flipped Off→On (`checked` false→true) and Back returned to the app,
+landing on the Location Access screen (now satisfiable, since location is enabled).
 
 ## Components (Approach A — one page object per screen)
 
@@ -215,6 +228,12 @@ public interface GpsDialogPage {
     void tapYes();
     void tapNo();
 }
+
+public interface LocationSettingsPage {
+    boolean isLocationSettingsDisplayed();
+    void enableLocation();   // idempotent — toggles on only if off
+    void returnToApp();      // Android Back
+}
 ```
 
 ### Android impls (`android/.../pages/`) — real locators
@@ -259,6 +278,7 @@ public static SplashCarouselPage getSplashCarouselPage(){ return create("SplashC
   - assert `locationPage.isLocationAccessDisplayed()`, `tapContinue()`
   - `PermissionUtils.allowPermission(driver)` to dismiss the system permission dialog
   - assert `gpsDialog.isGpsDialogDisplayed()`, `tapYes()`
+  - assert `locationSettings.isLocationSettingsDisplayed()`, `enableLocation()`, `returnToApp()`
 
 ## Error handling
 
