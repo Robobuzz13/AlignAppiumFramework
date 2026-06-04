@@ -1,7 +1,16 @@
 package com.align.factory;
 
 import com.align.config.ConfigLoader;
-import com.align.pages.LoginPage;
+import com.align.pages.BirthChartSummaryPage;
+import com.align.pages.BirthDetailsPage;
+import com.align.pages.GpsDialogPage;
+import com.align.pages.InsightPage;
+import com.align.pages.LocationAccessPage;
+import com.align.pages.LocationSettingsPage;
+import com.align.pages.NamePage;
+import com.align.pages.OptionListPage;
+import com.align.pages.SignupPage;
+import com.align.pages.SplashCarouselPage;
 
 import java.util.Map;
 
@@ -18,8 +27,44 @@ public class PageFactory {
         return ConfigLoader.getInstance().getProperty("platform", "android").toLowerCase();
     }
 
-    public static LoginPage getLoginPage() {
-        return create("LoginPage");
+    public static InsightPage getInsightPage() {
+        return create("InsightPage");
+    }
+
+    public static SplashCarouselPage getSplashCarouselPage() {
+        return create("SplashCarouselPage");
+    }
+
+    public static SignupPage getSignupPage() {
+        return create("SignupPage");
+    }
+
+    public static NamePage getNamePage() {
+        return create("NamePage");
+    }
+
+    public static BirthDetailsPage getBirthDetailsPage() {
+        return create("BirthDetailsPage");
+    }
+
+    public static BirthChartSummaryPage getBirthChartSummaryPage() {
+        return create("BirthChartSummaryPage");
+    }
+
+    public static LocationAccessPage getLocationAccessPage() {
+        return create("LocationAccessPage");
+    }
+
+    public static GpsDialogPage getGpsDialogPage() {
+        return create("GpsDialogPage");
+    }
+
+    public static LocationSettingsPage getLocationSettingsPage() {
+        return create("LocationSettingsPage");
+    }
+
+    public static OptionListPage getOptionListPage() {
+        return create("OptionListPage");
     }
 
     @SuppressWarnings("unchecked")
