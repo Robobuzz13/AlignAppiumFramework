@@ -138,6 +138,18 @@ public class OnboardingSteps {
         }
     }
 
+    @Step("Dismiss any personalized insight screens until the option list appears")
+    public void dismissInterstitialInsights() {
+        // After the location flow the app shows one or more daily-insight screens (same
+        // InsightPage layout, a Next button) before the interests list. Tap Next until the
+        // single-select list is shown.
+        InsightPage insight = PageFactory.getInsightPage();
+        OptionListPage list = PageFactory.getOptionListPage();
+        for (int i = 0; i < 6 && !list.isDisplayed() && insight.isNextButtonVisible(); i++) {
+            insight.tapNext();
+        }
+    }
+
     @Step("Select option '{option}' from the list and tap Continue")
     public void selectOptionAndContinue(String option) {
         OptionListPage listPage = PageFactory.getOptionListPage();

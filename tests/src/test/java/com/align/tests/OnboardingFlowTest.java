@@ -27,6 +27,7 @@ public class OnboardingFlowTest extends BaseTest {
         steps.confirmGpsDialog();
         steps.enableGpsAndReturnToApp();
         steps.advancePastLocationAccess();
+        steps.dismissInterstitialInsights();
         steps.selectOptionAndContinue("Explore My Birth Chart");
         steps.selectOptionAndContinue("Google Search");
     }
