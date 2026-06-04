@@ -1,0 +1,28 @@
+# Maven build output
+target/
+**/target/
+
+# Compiled class files (stray)
+*.class
+
+# IDE
+.idea/
+*.iml
+.vscode/
+.settings/
+.classpath
+.project
+
+# Appium / test artifacts
+**/allure-results/
+**/extent-reports/
+**/screenshots/
+**/videos/
+**/logs/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
