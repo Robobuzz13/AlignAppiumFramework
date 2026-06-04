@@ -1,0 +1,94 @@
+name: Android Tests
+
+on:
+  push:
+    branches: [ main, feature/** ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+    inputs:
+      execution_env:
+        description: 'Execution environment'
+        required: true
+        default: 'cloud'
+        type: choice
+        options: [local, cloud]
+      parallel:
+        description: 'Run tests in parallel'
+        required: false
+        default: 'true'
+        type: boolean
+      video_recording:
+        description: 'Enable video recording'
+        required: false
+        default: 'false'
+        type: boolean
+      app_path:
+        description: 'App binary path or cloud ID (e.g., bs://abc123)'
+        required: false
+        default: ''
+      app_url:
+        description: 'URL to download APK from (optional)'
+        required: false
+        default: ''
+      build_name:
+        description: 'Build name for cloud reporting'
+        required: false
+        default: 'GitHub-Actions'
+
+jobs:
+  android-tests:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+          cache: maven
+
+      - name: Build (skip tests)
+        run: mvn install -DskipTests -pl core,android,ios,tests
+
+      - name: Run Android Tests
+        env:
+          CLOUD_URL: ${{ secrets.BROWSERSTACK_URL }}
+          CLOUD_KEY: ${{ secrets.BROWSERSTACK_KEY }}
+          BUILD_NAME: ${{ github.event.inputs.build_name || github.sha }}
+        run: |
+          mvn test -pl tests \
+            -Dplatform=android \
+            -Denv=${{ github.event.inputs.execution_env || 'cloud' }} \
+            -Dsuite=src/test/resources/suites/android-suite.xml \
+            -Dvideo.recording.enabled=${{ github.event.inputs.video_recording || 'false' }} \
+            -Dapp.path="${{ github.event.inputs.app_path }}" \
+            -Dapp.url="${{ github.event.inputs.app_url }}"
+
+      - name: Generate Allure Report
+        if: always()
+        run: mvn allure:report -pl tests
+
+      - name: Upload Allure Results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: allure-results-android
+          path: tests/target/allure-results/
+
+      - name: Upload Extent Report
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: extent-report-android
+          path: tests/target/extent-reports/
+
+      - name: Upload Videos
+        uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: test-videos-android
+          path: tests/target/videos/
