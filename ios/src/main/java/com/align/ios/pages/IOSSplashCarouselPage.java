@@ -2,6 +2,7 @@ package com.align.ios.pages;
 
 import com.align.pages.BasePage;
 import com.align.pages.SplashCarouselPage;
+import com.align.utils.GestureUtils;
 import org.openqa.selenium.By;
 
 public class IOSSplashCarouselPage extends BasePage implements SplashCarouselPage {
@@ -29,5 +30,10 @@ public class IOSSplashCarouselPage extends BasePage implements SplashCarouselPag
     @Override
     public void tapSkip() {
         tap(SKIP_BUTTON);
+    }
+
+    @Override
+    public void swipeToNextSplash() {
+        GestureUtils.swipeLeft(getDriver());
     }
 }

@@ -5,4 +5,5 @@ public interface SplashCarouselPage {
     int getSplashOptionCount();
     String getTitle();
     void tapSkip();
+    void swipeToNextSplash();
 }

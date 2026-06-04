@@ -2,6 +2,7 @@ package com.align.android.pages;
 
 import com.align.pages.BasePage;
 import com.align.pages.SplashCarouselPage;
+import com.align.utils.GestureUtils;
 import org.openqa.selenium.By;
 
 public class AndroidSplashCarouselPage extends BasePage implements SplashCarouselPage {
@@ -30,5 +31,10 @@ public class AndroidSplashCarouselPage extends BasePage implements SplashCarouse
     @Override
     public void tapSkip() {
         tap(SKIP_BUTTON);
+    }
+
+    @Override
+    public void swipeToNextSplash() {
+        GestureUtils.swipeLeft(getDriver());
     }
 }

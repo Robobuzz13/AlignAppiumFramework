@@ -14,6 +14,8 @@ Test assertion chain:
 2. Tapping **Next** navigates to the splash carousel.
 3. Splash carousel shows a visible **Skip** button.
 4. Splash carousel exposes more than one splash option (page-indicator dots).
+5. Swiping through every splash screen reaches the signup screen.
+6. Signup screen accepts a random email/password and the **Signup** button is tappable.
 
 ## Locators (captured live via `adb uiautomator dump`)
 
@@ -36,6 +38,21 @@ Test assertion chain:
 | Title              | `com.dailyinsights:id/txtTitle`     | TextView |
 | Description        | `com.dailyinsights:id/txtDes`       | TextView |
 
+Swiping left (`GestureUtils.swipeLeft`) advances the carousel; 6 splash titles observed
+(Birth Chart, Game Changer, Time It Right, Astro-Hacks, Real People). After the last
+splash, the signup screen appears.
+
+### Screen C — Signup (post-carousel, `StartupActivity`)
+
+| Element        | Locator (resource-id)               | Type     |
+|----------------|-------------------------------------|----------|
+| Email field    | `com.dailyinsights:id/edtEmail`     | EditText |
+| Password field | `com.dailyinsights:id/edtPassword`  | EditText |
+| Signup button  | `com.dailyinsights:id/txtSingup`    | TextView (clickable) |
+
+Note: the app misspells the clickable button id as `txtSingup`. The correctly-spelled
+`txtSignup` is the non-clickable screen header — do not target it.
+
 ## Components (Approach A — one page object per screen)
 
 ### Interfaces (`core/src/main/java/com/align/pages/`)
@@ -52,6 +69,14 @@ public interface SplashCarouselPage {
     int getSplashOptionCount();   // counts worm_dot elements
     String getTitle();
     void tapSkip();
+    void swipeToNextSplash();     // GestureUtils.swipeLeft
+}
+
+public interface SignupPage {
+    boolean isSignupScreenVisible();
+    void enterEmail(String email);
+    void enterPassword(String password);
+    void tapSignup();
 }
 ```
 
@@ -79,11 +104,14 @@ public static SplashCarouselPage getSplashCarouselPage(){ return create("SplashC
 ### Test (`tests/src/test/java/com/align/tests/OnboardingFlowTest.java`)
 
 `OnboardingFlowTest extends BaseTest`:
-- `nextLeadsToSplashWithSkipAndOptions()`:
+- `onboardingThroughSignup()`:
   - assert `insightPage.isNextButtonVisible()`
   - `insightPage.tapNext()`
   - assert `splashPage.isSkipButtonVisible()`
   - assert `splashPage.getSplashOptionCount() > 1`
+  - swipe `swipeToNextSplash()` in a guarded loop (max 10) until `signupPage.isSignupScreenVisible()`
+  - assert `signupPage.isSignupScreenVisible()`
+  - enter random email (`qa_<uuid8>@example.com`) + password (`Pass<uuid6>!`), `tapSignup()`
 
 ## Error handling
 

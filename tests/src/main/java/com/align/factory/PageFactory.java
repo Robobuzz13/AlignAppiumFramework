@@ -3,6 +3,7 @@ package com.align.factory;
 import com.align.config.ConfigLoader;
 import com.align.pages.InsightPage;
 import com.align.pages.LoginPage;
+import com.align.pages.SignupPage;
 import com.align.pages.SplashCarouselPage;
 
 import java.util.Map;
@@ -30,6 +31,10 @@ public class PageFactory {
 
     public static SplashCarouselPage getSplashCarouselPage() {
         return create("SplashCarouselPage");
+    }
+
+    public static SignupPage getSignupPage() {
+        return create("SignupPage");
     }
 
     @SuppressWarnings("unchecked")
