@@ -8,12 +8,8 @@ public class OnboardingFlowTest extends BaseTest {
 
     private final OnboardingSteps steps = new OnboardingSteps();
 
-    @Test(description = "Onboarding: Next -> splash -> signup -> name -> birth details -> summary -> interests")
-    @Description("Drives the full com.dailyinsights onboarding: insight Next, swipe through the "
-            + "splash carousel to signup, sign up with random credentials, enter a random name, fill "
-            + "random birth date/time/location, confirm the birth-chart summary, pass the post-chart "
-            + "insight, grant location permission and enable GPS, then select an interest and an "
-            + "acquisition source. Steps live in OnboardingSteps; this class only orchestrates them.")
+    @Test(description = "Onboarding flow of the app")
+    @Description("Drives the full onboarding flow of the app")
     public void onboardingThroughSignup() {
         steps.verifyInsightAndAdvance();
         steps.advanceThroughSplashCarousel();
@@ -30,8 +26,6 @@ public class OnboardingFlowTest extends BaseTest {
         steps.dismissInterstitialInsights();
         steps.selectOptionAndContinue("Explore My Birth Chart");
         steps.selectOptionAndContinue("Google Search");
-
-        // Final verification: onboarding ends on the subscription paywall.
         steps.verifyPaymentPage();
     }
 }
