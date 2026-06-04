@@ -27,8 +27,8 @@ public class IOSCapabilities {
 
         options.setNoReset(false);
         options.setAutoAcceptAlerts(false);
-        options.setCapability("newCommandTimeout", 300);
-        options.setWdaLaunchTimeout(60000);
+        options.setNewCommandTimeout(java.time.Duration.ofSeconds(300));
+        options.setWdaLaunchTimeout(java.time.Duration.ofMillis(60000));
 
         if (config.isCloud()) {
             applyCloudCapabilities(options, config);

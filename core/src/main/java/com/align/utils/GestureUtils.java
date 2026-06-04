@@ -88,6 +88,7 @@ public class GestureUtils {
                         PointerInput.Origin.fromElement(element), 0, 0))
                 .addAction(finger.createPointerDown(PointerInput.MouseButton.LEFT.asArg()))
                 .addAction(finger.createPointerUp(PointerInput.MouseButton.LEFT.asArg()))
+                .addAction(finger.createPause(Duration.ofMillis(100)))
                 .addAction(finger.createPointerDown(PointerInput.MouseButton.LEFT.asArg()))
                 .addAction(finger.createPointerUp(PointerInput.MouseButton.LEFT.asArg()));
         driver.perform(List.of(sequence));

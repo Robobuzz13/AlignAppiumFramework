@@ -27,6 +27,11 @@ public class DriverFactory {
             Object factory = factoryClass.getDeclaredConstructor().newInstance();
             return (AppiumDriver) factoryClass.getMethod("createDriver", DeviceConfig.class)
                     .invoke(factory, config);
+        } catch (java.lang.reflect.InvocationTargetException e) {
+            Throwable cause = e.getCause();
+            throw new DriverInitException("Failed to create AndroidDriver: " +
+                    (cause != null ? cause.getMessage() : e.getMessage()),
+                    cause != null ? cause : e);
         } catch (Exception e) {
             throw new DriverInitException("Failed to create AndroidDriver: " + e.getMessage(), e);
         }
@@ -38,6 +43,11 @@ public class DriverFactory {
             Object factory = factoryClass.getDeclaredConstructor().newInstance();
             return (AppiumDriver) factoryClass.getMethod("createDriver", DeviceConfig.class)
                     .invoke(factory, config);
+        } catch (java.lang.reflect.InvocationTargetException e) {
+            Throwable cause = e.getCause();
+            throw new DriverInitException("Failed to create IOSDriver: " +
+                    (cause != null ? cause.getMessage() : e.getMessage()),
+                    cause != null ? cause : e);
         } catch (Exception e) {
             throw new DriverInitException("Failed to create IOSDriver: " + e.getMessage(), e);
         }

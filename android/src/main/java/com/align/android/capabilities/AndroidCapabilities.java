@@ -27,7 +27,7 @@ public class AndroidCapabilities {
 
         options.setNoReset(false);
         options.setAutoGrantPermissions(true);
-        options.setCapability("newCommandTimeout", 300);
+        options.setNewCommandTimeout(java.time.Duration.ofSeconds(300));
 
         if (config.isCloud()) {
             applyCloudCapabilities(options, config);
