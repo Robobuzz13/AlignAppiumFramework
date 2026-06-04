@@ -2,6 +2,7 @@ package com.align.android.pages;
 
 import com.align.pages.BasePage;
 import com.align.pages.SignupPage;
+import com.align.utils.KeyboardUtils;
 import org.openqa.selenium.By;
 
 public class AndroidSignupPage extends BasePage implements SignupPage {
@@ -30,6 +31,8 @@ public class AndroidSignupPage extends BasePage implements SignupPage {
 
     @Override
     public void tapSignup() {
+        // The soft keyboard from the password field covers the Signup button; hide it first.
+        KeyboardUtils.hideKeyboard(getDriver());
         tap(SIGNUP_BUTTON);
     }
 }

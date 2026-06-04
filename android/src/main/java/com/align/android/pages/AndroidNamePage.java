@@ -2,6 +2,7 @@ package com.align.android.pages;
 
 import com.align.pages.BasePage;
 import com.align.pages.NamePage;
+import com.align.utils.KeyboardUtils;
 import org.openqa.selenium.By;
 
 public class AndroidNamePage extends BasePage implements NamePage {
@@ -22,6 +23,8 @@ public class AndroidNamePage extends BasePage implements NamePage {
 
     @Override
     public void tapNext() {
+        // Hide the soft keyboard so the Next button below the field is clickable.
+        KeyboardUtils.hideKeyboard(getDriver());
         tap(NEXT_BUTTON);
     }
 }

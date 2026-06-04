@@ -21,6 +21,13 @@ public class AndroidCapabilities {
         if (!config.getAppPath().isEmpty()) {
             options.setApp(config.getAppPath());
         }
+        // For an already-installed app, launch by package/activity instead of an apk path.
+        if (!config.getAppPackage().isEmpty()) {
+            options.setAppPackage(config.getAppPackage());
+        }
+        if (!config.getAppActivity().isEmpty()) {
+            options.setAppActivity(config.getAppActivity());
+        }
         if (!config.getPlatformVersion().isEmpty()) {
             options.setPlatformVersion(config.getPlatformVersion());
         }

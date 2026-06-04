@@ -24,6 +24,12 @@
         <maven.compiler.target>17</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <appium.version>9.2.3</appium.version>
+        <!-- java-client 9.2.3's SupportsContextSwitching extends org.openqa.selenium.ContextAware,
+             which later Selenium 4.x releases removed. java-client declares the range
+             [4.19.0, 5.0); Maven otherwise resolves 4.44.0 (no ContextAware) and the
+             AndroidDriver/IOSDriver fail to load at runtime. Pin to the 4.19.0 floor, which
+             still ships ContextAware and is the version java-client 9.2.3 was built against. -->
+        <selenium.version>4.19.0</selenium.version>
         <testng.version>7.9.0</testng.version>
         <allure.version>2.27.0</allure.version>
         <extentreports.version>5.1.1</extentreports.version>
@@ -34,6 +40,14 @@
 
     <dependencyManagement>
         <dependencies>
+            <!-- Force Selenium 4.43.0 across all transitive selenium artifacts. -->
+            <dependency>
+                <groupId>org.seleniumhq.selenium</groupId>
+                <artifactId>selenium-bom</artifactId>
+                <version>${selenium.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
             <dependency>
                 <groupId>io.appium</groupId>
                 <artifactId>java-client</artifactId>
