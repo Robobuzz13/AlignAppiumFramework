@@ -1,6 +1,7 @@
 package com.align.factory;
 
 import com.align.config.ConfigLoader;
+import com.align.pages.BirthChartSummaryPage;
 import com.align.pages.BirthDetailsPage;
 import com.align.pages.InsightPage;
 import com.align.pages.LoginPage;
@@ -45,6 +46,10 @@ public class PageFactory {
 
     public static BirthDetailsPage getBirthDetailsPage() {
         return create("BirthDetailsPage");
+    }
+
+    public static BirthChartSummaryPage getBirthChartSummaryPage() {
+        return create("BirthChartSummaryPage");
     }
 
     @SuppressWarnings("unchecked")

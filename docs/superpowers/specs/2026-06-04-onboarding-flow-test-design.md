@@ -19,6 +19,7 @@ Test assertion chain:
 7. Name screen accepts a random name and the **Next** button advances to birth details.
 8. Birth-details screen accepts a date, time, and location, and **Next** advances to the
    birth-chart summary.
+9. Birth-chart summary shows **Edit Birth Information** and **Continue** advances the flow.
 
 ## Locators (captured live via `adb uiautomator dump`)
 
@@ -96,6 +97,17 @@ Swipe mechanics on the NumberPicker were verified live via adb (a downward swipe
 wider than the EditText scrolls one or more steps); the Appium-driver swipe path
 (`GestureUtils.swipe`) is not yet runtime-verified against an Appium session.
 
+### Screen F — Birth-chart summary (post-birth-details, `StartupActivity`)
+
+| Element            | Locator (resource-id)                  | Type     |
+|--------------------|----------------------------------------|----------|
+| Edit birth info    | `com.dailyinsights:id/txtEditBirthInfo`| TextView ("✏️ Edit Birth Information") |
+| Continue           | `com.dailyinsights:id/imgNext`         | TextView (advances the flow) |
+
+The summary echoes the entered birth date/time/location (`birthDate`, `txtBirthTime`,
+`txtBirthLocation`). The page object asserts Edit Birth Information is displayed and taps
+Continue, which advances to a chart-generation loading screen.
+
 ## Components (Approach A — one page object per screen)
 
 ### Interfaces (`core/src/main/java/com/align/pages/`)
@@ -135,6 +147,11 @@ public interface BirthDetailsPage {
     void setBirthLocation(String city);  // searches and selects the first match
     void tapNext();
 }
+
+public interface BirthChartSummaryPage {
+    boolean isEditBirthInfoDisplayed();
+    void tapContinue();
+}
 ```
 
 ### Android impls (`android/.../pages/`) — real locators
@@ -173,6 +190,8 @@ public static SplashCarouselPage getSplashCarouselPage(){ return create("SplashC
   - enter random name (`QA <uuid5>`), `tapNext()`
   - assert `birthPage.isBirthDetailsScreenVisible()`
   - `setBirthDate()`, `setBirthTime()`, `setBirthLocation("London")`, `tapNext()`
+  - assert `summaryPage.isEditBirthInfoDisplayed()`
+  - `summaryPage.tapContinue()`
 
 ## Error handling
 

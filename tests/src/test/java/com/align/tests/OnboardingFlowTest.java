@@ -1,6 +1,7 @@
 package com.align.tests;
 
 import com.align.factory.PageFactory;
+import com.align.pages.BirthChartSummaryPage;
 import com.align.pages.BirthDetailsPage;
 import com.align.pages.InsightPage;
 import com.align.pages.NamePage;
@@ -18,11 +19,12 @@ public class OnboardingFlowTest extends BaseTest {
     // Guards the swipe loop so a missing signup screen fails fast instead of looping forever.
     private static final int MAX_SPLASH_SWIPES = 10;
 
-    @Test(description = "Onboarding: Next -> splash -> signup -> name -> birth details -> Next")
+    @Test(description = "Onboarding: Next -> splash -> signup -> name -> birth details -> summary -> Continue")
     @Description("Validates the full onboarding hand-off: insight Next button navigates to the "
             + "splash carousel with a Skip button and multiple options, swipes through every splash "
             + "screen to the signup screen, enters a random email/password and taps Signup, enters "
-            + "a random name and taps Next, then fills birth date/time/location and taps Next")
+            + "a random name and taps Next, fills random birth date/time/location and taps Next, then "
+            + "verifies the birth-chart summary shows Edit Birth Information and taps Continue")
     public void onboardingThroughSignup() {
         InsightPage insightPage = PageFactory.getInsightPage();
         Assert.assertTrue(insightPage.isNextButtonVisible(), "Next button should be visible on insight screen");
@@ -46,6 +48,11 @@ public class OnboardingFlowTest extends BaseTest {
         BirthDetailsPage birthPage = PageFactory.getBirthDetailsPage();
         Assert.assertTrue(birthPage.isBirthDetailsScreenVisible(), "Birth details screen should be visible after name");
         fillBirthDetailsAndContinue(birthPage);
+
+        BirthChartSummaryPage summaryPage = PageFactory.getBirthChartSummaryPage();
+        Assert.assertTrue(summaryPage.isEditBirthInfoDisplayed(),
+                "Edit Birth Information should be displayed on the birth-chart summary");
+        summaryPage.tapContinue();
     }
 
     @Step("Tap Next to advance to splash carousel")
