@@ -1,7 +1,9 @@
 package com.align.factory;
 
 import com.align.config.ConfigLoader;
+import com.align.pages.InsightPage;
 import com.align.pages.LoginPage;
+import com.align.pages.SplashCarouselPage;
 
 import java.util.Map;
 
@@ -20,6 +22,14 @@ public class PageFactory {
 
     public static LoginPage getLoginPage() {
         return create("LoginPage");
+    }
+
+    public static InsightPage getInsightPage() {
+        return create("InsightPage");
+    }
+
+    public static SplashCarouselPage getSplashCarouselPage() {
+        return create("SplashCarouselPage");
     }
 
     @SuppressWarnings("unchecked")
