@@ -1,9 +1,11 @@
 package com.align.utils;
 
 import io.appium.java_client.AppiumDriver;
-import io.appium.java_client.android.AndroidDriver;
+import io.appium.java_client.HasOnScreenKeyboard;
+import io.appium.java_client.HidesKeyboard;
 import io.appium.java_client.android.nativekey.AndroidKey;
 import io.appium.java_client.android.nativekey.KeyEvent;
+import io.appium.java_client.android.nativekey.PressesKey;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.slf4j.Logger;
@@ -16,7 +18,7 @@ public class KeyboardUtils {
 
     public static void hideKeyboard(AppiumDriver driver) {
         try {
-            driver.hideKeyboard();
+            ((HidesKeyboard) driver).hideKeyboard();
         } catch (Exception e) {
             log.warn("Could not hide keyboard: {}", e.getMessage());
         }
@@ -24,7 +26,7 @@ public class KeyboardUtils {
 
     public static boolean isKeyboardShown(AppiumDriver driver) {
         try {
-            return driver.isKeyboardShown();
+            return ((HasOnScreenKeyboard) driver).isKeyboardShown();
         } catch (Exception e) {
             return false;
         }
@@ -43,8 +45,8 @@ public class KeyboardUtils {
     }
 
     public static void pressAndroidKey(AppiumDriver driver, AndroidKey key) {
-        if (driver instanceof AndroidDriver) {
-            ((AndroidDriver) driver).pressKey(new KeyEvent(key));
+        if (driver instanceof PressesKey) {
+            ((PressesKey) driver).pressKey(new KeyEvent(key));
         } else {
             log.warn("pressAndroidKey called on non-Android driver — skipped");
         }

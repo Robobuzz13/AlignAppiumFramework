@@ -2,10 +2,6 @@ package com.align.utils;
 
 import com.align.config.ConfigLoader;
 import io.appium.java_client.AppiumDriver;
-import io.appium.java_client.android.AndroidDriver;
-import io.appium.java_client.android.screenrecording.AndroidStartScreenRecordingOptions;
-import io.appium.java_client.ios.IOSDriver;
-import io.appium.java_client.ios.screenrecording.IOSStartScreenRecordingOptions;
 import io.appium.java_client.screenrecording.CanRecordScreen;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,7 +10,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Base64;
@@ -37,17 +32,7 @@ public class VideoUtils {
             return;
         }
         try {
-            if (driver instanceof AndroidDriver) {
-                ((AndroidDriver) driver).startRecordingScreen(
-                        new AndroidStartScreenRecordingOptions()
-                                .withBitRate(4_000_000)
-                                .withTimeLimit(Duration.ofMinutes(30)));
-            } else if (driver instanceof IOSDriver) {
-                ((IOSDriver) driver).startRecordingScreen(
-                        new IOSStartScreenRecordingOptions()
-                                .withVideoQuality(IOSStartScreenRecordingOptions.VideoQuality.MEDIUM)
-                                .withTimeLimit(Duration.ofMinutes(30)));
-            }
+            ((CanRecordScreen) driver).startRecordingScreen();
             log.debug("Screen recording started");
         } catch (Exception e) {
             log.warn("Failed to start screen recording: {}", e.getMessage());

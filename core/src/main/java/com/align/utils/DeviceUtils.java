@@ -1,7 +1,11 @@
 package com.align.utils;
 
 import io.appium.java_client.AppiumDriver;
+import io.appium.java_client.HasDeviceTime;
+import io.appium.java_client.LocksDevice;
 import io.appium.java_client.ios.IOSDriver;
+import io.appium.java_client.ios.ShakesDevice;
+import io.appium.java_client.remote.SupportsRotation;
 import org.openqa.selenium.ScreenOrientation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,44 +18,44 @@ public class DeviceUtils {
     private DeviceUtils() {}
 
     public static void lockDevice(AppiumDriver driver) {
-        driver.lockDevice();
+        ((LocksDevice) driver).lockDevice();
         log.debug("Device locked");
     }
 
     public static void lockDevice(AppiumDriver driver, Duration duration) {
-        driver.lockDevice(duration);
+        ((LocksDevice) driver).lockDevice(duration);
     }
 
     public static void unlockDevice(AppiumDriver driver) {
-        driver.unlockDevice();
+        ((LocksDevice) driver).unlockDevice();
         log.debug("Device unlocked");
     }
 
     public static boolean isDeviceLocked(AppiumDriver driver) {
-        return driver.isDeviceLocked();
+        return ((LocksDevice) driver).isDeviceLocked();
     }
 
     public static void rotatePortrait(AppiumDriver driver) {
-        driver.rotate(ScreenOrientation.PORTRAIT);
+        ((SupportsRotation) driver).rotate(ScreenOrientation.PORTRAIT);
     }
 
     public static void rotateLandscape(AppiumDriver driver) {
-        driver.rotate(ScreenOrientation.LANDSCAPE);
+        ((SupportsRotation) driver).rotate(ScreenOrientation.LANDSCAPE);
     }
 
     public static ScreenOrientation getDeviceOrientation(AppiumDriver driver) {
-        return driver.getOrientation();
+        return ((SupportsRotation) driver).getOrientation();
     }
 
     public static void shake(AppiumDriver driver) {
         if (driver instanceof IOSDriver) {
-            ((IOSDriver) driver).shake();
+            ((ShakesDevice) driver).shake();
         } else {
             log.warn("shake() is iOS simulator only");
         }
     }
 
     public static String getDeviceTime(AppiumDriver driver) {
-        return driver.getDeviceTime();
+        return ((HasDeviceTime) driver).getDeviceTime();
     }
 }

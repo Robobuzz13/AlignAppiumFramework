@@ -1,7 +1,7 @@
 package com.align.utils;
 
 import io.appium.java_client.AppiumDriver;
-import io.appium.java_client.android.AndroidDriver;
+import io.appium.java_client.android.StartsActivity;
 import org.openqa.selenium.By;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,7 +20,7 @@ public class PermissionUtils {
     private PermissionUtils() {}
 
     public static void allowPermission(AppiumDriver driver) {
-        if (driver instanceof AndroidDriver) {
+        if (driver instanceof StartsActivity) {
             if (WaitUtils.isVisible(driver, ALLOW_BUTTON, 3)) {
                 driver.findElement(ALLOW_BUTTON).click();
             } else if (WaitUtils.isVisible(driver, ALLOW_FOREGROUND, 3)) {
@@ -34,7 +34,7 @@ public class PermissionUtils {
     }
 
     public static void denyPermission(AppiumDriver driver) {
-        if (driver instanceof AndroidDriver) {
+        if (driver instanceof StartsActivity) {
             if (WaitUtils.isVisible(driver, DENY_BUTTON, 3)) {
                 driver.findElement(DENY_BUTTON).click();
             }
@@ -46,9 +46,9 @@ public class PermissionUtils {
     }
 
     public static void grantPermission(AppiumDriver driver, String packageName, String permission) {
-        if (driver instanceof AndroidDriver) {
+        if (driver instanceof StartsActivity) {
             String cmd = String.format("pm grant %s %s", packageName, permission);
-            ((AndroidDriver) driver).executeScript("mobile: shell", Map.of("command", cmd));
+            driver.executeScript("mobile: shell", Map.of("command", cmd));
             log.info("Granted permission {} to {}", permission, packageName);
         } else {
             log.warn("grantPermission via ADB is Android-only");
@@ -56,9 +56,9 @@ public class PermissionUtils {
     }
 
     public static void resetPermissions(AppiumDriver driver, String packageName) {
-        if (driver instanceof AndroidDriver) {
+        if (driver instanceof StartsActivity) {
             String cmd = "pm reset-permissions " + packageName;
-            ((AndroidDriver) driver).executeScript("mobile: shell", Map.of("command", cmd));
+            driver.executeScript("mobile: shell", Map.of("command", cmd));
             log.info("Reset permissions for {}", packageName);
         } else {
             log.warn("resetPermissions() is Android-only — skipped");

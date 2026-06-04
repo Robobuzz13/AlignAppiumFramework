@@ -1,7 +1,7 @@
 package com.align.utils;
 
 import io.appium.java_client.AppiumDriver;
-import io.appium.java_client.android.AndroidDriver;
+import io.appium.java_client.android.StartsActivity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -14,7 +14,7 @@ public class DeepLinkUtils {
 
     public static void openDeepLink(AppiumDriver driver, String url) {
         log.info("Opening deep link: {}", url);
-        if (driver instanceof AndroidDriver) {
+        if (driver instanceof StartsActivity) {
             driver.executeScript("mobile: deepLink", Map.of(
                     "url", url,
                     "package", getPackageName(driver)
@@ -31,7 +31,7 @@ public class DeepLinkUtils {
 
     private static String getPackageName(AppiumDriver driver) {
         try {
-            return (String) ((AndroidDriver) driver).getCurrentPackage();
+            return ((StartsActivity) driver).getCurrentPackage();
         } catch (Exception e) {
             return "";
         }

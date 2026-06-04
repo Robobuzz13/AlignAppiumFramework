@@ -1,19 +1,24 @@
 package com.align.utils;
 
 import io.appium.java_client.AppiumDriver;
+import io.appium.java_client.clipboard.HasClipboard;
 
 public class ClipboardUtils {
     private ClipboardUtils() {}
 
+    private static HasClipboard clipboard(AppiumDriver driver) {
+        return (HasClipboard) driver;
+    }
+
     public static void setClipboard(AppiumDriver driver, String text) {
-        driver.setClipboardText(text);
+        clipboard(driver).setClipboardText(text);
     }
 
     public static String getClipboard(AppiumDriver driver) {
-        return driver.getClipboardText();
+        return clipboard(driver).getClipboardText();
     }
 
     public static void clearClipboard(AppiumDriver driver) {
-        driver.setClipboardText("");
+        clipboard(driver).setClipboardText("");
     }
 }

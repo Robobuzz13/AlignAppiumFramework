@@ -1,7 +1,7 @@
 package com.align.utils;
 
 import io.appium.java_client.AppiumDriver;
-import io.appium.java_client.android.AndroidDriver;
+import io.appium.java_client.android.HasNotifications;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.slf4j.Logger;
@@ -16,14 +16,14 @@ public class NotificationUtils {
     private NotificationUtils() {}
 
     public static void openNotificationCenter(AppiumDriver driver) {
-        requireAndroid(driver, "openNotificationCenter");
-        ((AndroidDriver) driver).openNotifications();
+        requireAndroidNotifications(driver, "openNotificationCenter");
+        ((HasNotifications) driver).openNotifications();
         log.info("Notification center opened");
     }
 
     public static void clearNotifications(AppiumDriver driver) {
-        requireAndroid(driver, "clearNotifications");
-        ((AndroidDriver) driver).openNotifications();
+        requireAndroidNotifications(driver, "clearNotifications");
+        ((HasNotifications) driver).openNotifications();
         By clearAll = By.id("com.android.systemui:id/dismiss_text");
         if (WaitUtils.isVisible(driver, clearAll, 3)) {
             driver.findElement(clearAll).click();
@@ -32,8 +32,8 @@ public class NotificationUtils {
     }
 
     public static List<String> getNotificationText(AppiumDriver driver) {
-        requireAndroid(driver, "getNotificationText");
-        ((AndroidDriver) driver).openNotifications();
+        requireAndroidNotifications(driver, "getNotificationText");
+        ((HasNotifications) driver).openNotifications();
         By notifTitle = By.id("android:id/title");
         List<WebElement> notifications = driver.findElements(notifTitle);
         return notifications.stream()
@@ -41,8 +41,8 @@ public class NotificationUtils {
                 .collect(Collectors.toList());
     }
 
-    private static void requireAndroid(AppiumDriver driver, String method) {
-        if (!(driver instanceof AndroidDriver)) {
+    private static void requireAndroidNotifications(AppiumDriver driver, String method) {
+        if (!(driver instanceof HasNotifications)) {
             throw new UnsupportedOperationException(method + "() is Android-only");
         }
     }
