@@ -20,6 +20,8 @@ Test assertion chain:
 8. Birth-details screen accepts a date, time, and location, and **Next** advances to the
    birth-chart summary.
 9. Birth-chart summary shows **Edit Birth Information** and **Continue** advances the flow.
+10. After chart generation a personalized insight screen appears (reuses the opening insight
+    layout); **Next** advances to the Location Access permission screen.
 
 ## Locators (captured live via `adb uiautomator dump`)
 
@@ -108,6 +110,14 @@ The summary echoes the entered birth date/time/location (`birthDate`, `txtBirthT
 `txtBirthLocation`). The page object asserts Edit Birth Information is displayed and taps
 Continue, which advances to a chart-generation loading screen.
 
+### Screen G — Personalized insight (post-chart-generation, `StartupActivity`)
+
+After the chart loads, the app shows a personalized insight screen that reuses the **same
+layout and resource-ids as the opening insight screen** (`imgTopIcon`, `txtContent`,
+`txtSubText`, `txtContinue`). No new page object is needed — `InsightPage` is reused. The
+test asserts the Next button is visible and taps it, which advances to the Location Access
+permission screen (the next screen in the flow, not yet modelled).
+
 ## Components (Approach A — one page object per screen)
 
 ### Interfaces (`core/src/main/java/com/align/pages/`)
@@ -192,6 +202,7 @@ public static SplashCarouselPage getSplashCarouselPage(){ return create("SplashC
   - `setBirthDate()`, `setBirthTime()`, `setBirthLocation("London")`, `tapNext()`
   - assert `summaryPage.isEditBirthInfoDisplayed()`
   - `summaryPage.tapContinue()`
+  - assert `chartInsight.isNextButtonVisible()` (reused `InsightPage`), `tapNext()`
 
 ## Error handling
 

@@ -19,12 +19,13 @@ public class OnboardingFlowTest extends BaseTest {
     // Guards the swipe loop so a missing signup screen fails fast instead of looping forever.
     private static final int MAX_SPLASH_SWIPES = 10;
 
-    @Test(description = "Onboarding: Next -> splash -> signup -> name -> birth details -> summary -> Continue")
+    @Test(description = "Onboarding: Next -> splash -> signup -> name -> birth details -> summary -> chart insight")
     @Description("Validates the full onboarding hand-off: insight Next button navigates to the "
             + "splash carousel with a Skip button and multiple options, swipes through every splash "
             + "screen to the signup screen, enters a random email/password and taps Signup, enters "
-            + "a random name and taps Next, fills random birth date/time/location and taps Next, then "
-            + "verifies the birth-chart summary shows Edit Birth Information and taps Continue")
+            + "a random name and taps Next, fills random birth date/time/location and taps Next, "
+            + "verifies the birth-chart summary shows Edit Birth Information and taps Continue, then "
+            + "verifies the personalized insight screen appears after chart generation and taps Next")
     public void onboardingThroughSignup() {
         InsightPage insightPage = PageFactory.getInsightPage();
         Assert.assertTrue(insightPage.isNextButtonVisible(), "Next button should be visible on insight screen");
@@ -53,6 +54,13 @@ public class OnboardingFlowTest extends BaseTest {
         Assert.assertTrue(summaryPage.isEditBirthInfoDisplayed(),
                 "Edit Birth Information should be displayed on the birth-chart summary");
         summaryPage.tapContinue();
+
+        // After chart generation the app shows a personalized insight screen that reuses the
+        // same layout as the opening insight screen, so InsightPage applies again.
+        InsightPage chartInsight = PageFactory.getInsightPage();
+        Assert.assertTrue(chartInsight.isNextButtonVisible(),
+                "Personalized insight screen should appear after chart generation");
+        chartInsight.tapNext();
     }
 
     @Step("Tap Next to advance to splash carousel")
